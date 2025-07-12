@@ -1,9 +1,11 @@
+import React from "react";
+import MainMenu from "./components/MainMenu";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+
+
 function App() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-green-500 text-white">
-      <h1 className="text-4xl font-bold">Chattrance UI is working!</h1>
-    </div>
-  );
+    return <MainMenu />;
 }
 
 export default App;
