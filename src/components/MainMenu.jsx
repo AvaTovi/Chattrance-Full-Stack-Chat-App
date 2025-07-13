@@ -17,7 +17,7 @@ function MainMenu() {
         {/* Logo & Title */}
         <div className="flex items-center">
           <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
-          <h1 className="text-xl font-extrabold" style={{ fontFamily: "Outfit" }}>
+          <h1 className="text-2xl font-extrabold" style={{ fontFamily: "Outfit" }}>
             Chattrance
           </h1>
         </div>
