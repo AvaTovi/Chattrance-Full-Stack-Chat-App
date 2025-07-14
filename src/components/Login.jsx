@@ -4,6 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 function Login() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+
+  const isLoggedIn = false; // placeholder for now
+  const handleLogout = () => {
+    console.log("Logged out");
+    navigate("/login");
+  };
+
   return (
     <div className="h-screen flex flex-col bg-black">
       {/* Header */}
@@ -26,19 +33,40 @@ function Login() {
             <div className="h-1 w-6 bg-white transition" />
             <div className="h-1 w-6 bg-white transition" />
           </button>
-
           {isOpen && (
-            <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col space-y-2 p-2 z-50">
-              <li>
-                <Link to="/login" className="block px-4 py-2 hover:bg-gray-200">Sign In</Link>
-              </li>
-              <li>
-                <Link to="/signup" className="block px-4 py-2 hover:bg-gray-200">Sign Up</Link>
-              </li>
+            <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
+              {isLoggedIn ? (
+                <>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/account">Account Info</Link>
+                  </li>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/settings">Settings</Link>
+                  </li>
+                  <li className="block px-4 py-2 hover:bg-gray-200 text-red-600">
+                    <button onClick={handleLogout} className="w-full text-left">
+                      Sign Out
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/settings">Settings</Link>
+                  </li>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/login">Sign In</Link>
+                  </li>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/signup">Sign Up</Link>
+                  </li>
+                </>
+              )}
             </ul>
           )}
         </div>
       </div>
+
       {/* Login screen */}
       <section className="min-h-screen flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-400 via-50% to-orange-400 to-100%">
         <div className="flex shadow-2xl">
@@ -54,7 +82,7 @@ function Login() {
               <span>Password</span>
               <input type="text" className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
-            {/* Remember password putton */}
+            {/* Remember password button */}
             <div className="flex gap-1 items-center">
               <input type="checkbox" />
               <span className="text-base">Remember Password</span>
@@ -63,9 +91,11 @@ function Login() {
             {/* Login Button */}
             <div>
               <button className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Login</button>
-              <p className="font-semibold pt-5">Don't have an account? <a href="/Signup" className="text-blue-400 hover:underline">Register</a></p>
+              <p className="font-semibold pt-5">Don't have an account? <a href="/signup" className="text-blue-400 hover:underline">Register</a></p>
             </div>
-
+            <div className="mt-1">
+            <a href="/" className="text-blue-400 mt-5 underline hover:underline">Back to Main Menu</a>
+            </div>
           </div>
         </div>
       </section>

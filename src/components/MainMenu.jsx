@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function MainMenu() {
+function MainMenu( isLoggedIn, handleLogout) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -34,15 +34,33 @@ function MainMenu() {
           </button>
 
           {isOpen && (
-            <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col space-y-2 p-2 z-50">
-              <li>
-                <Link to="/login" className="block px-4 py-2 hover:bg-gray-200">Sign In</Link>
-              </li>
-              <li>
-                <Link to="/signup" className="block px-4 py-2 hover:bg-gray-200">Sign Up</Link>
-              </li>
-            </ul>
-          )}
+          <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
+            {isLoggedIn ? (
+              <>
+                <li className="block px-4 py-2 hover:bg-gray-200">
+                  <Link to="/account">Account Info</Link>
+                </li>
+                <li className="block px-4 py-2 hover:bg-gray-200">
+                  <Link to="/settings">Settings</Link>
+                </li>
+                <li className="block px-4 py-2 hover:bg-gray-200 text-red-600">
+                  <button onClick={handleLogout} className="w-full text-left">
+                    Sign Out
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="block px-4 py-2 hover:bg-gray-200">
+                  <Link to="/settings">Settings</Link>
+                </li>
+                <li className="block px-4 py-2 hover:bg-gray-200">
+                  <Link to="/login">Log In</Link>
+                </li>
+              </>
+            )}
+          </ul>
+        )}
         </div>
       </div>
 
