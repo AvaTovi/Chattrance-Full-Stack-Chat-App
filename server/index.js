@@ -4,11 +4,13 @@ const mysql = require('mysql2');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const path = require('path');
+require('dotenv').config();
 const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 
 const MAX_USERNAME_LENGTH = 50;
 const MAX_PASSWORD_LENGTH = 255;
 const MIN_PASSWORD_LENGTH = 6;
+const PORT = process.env.PORT || 3000;
 
 // Alphanumeric plus underscores and dashes
 const VALID_CHARACTERS = /^[a-zA-Z0-9_-]+$/;
@@ -26,10 +28,10 @@ app.get('/', (req, res) => {
 });
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'chatuser',
-    password: '1213',
-    database: 'chat_app'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 db.connect(err => {
@@ -37,7 +39,7 @@ db.connect(err => {
     console.log('Connected to MySQL');
 });
 
-app.route('/signup').post(async (req, res) => {
+app.post('/signup', async (req, res) => {
     const { username, password, email } = req.body;
 
     if (!username || !email || !password) {
@@ -73,7 +75,7 @@ app.route('/signup').post(async (req, res) => {
     }
 });
 
-app.route('/login').post(async (req, res) => {
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -96,5 +98,4 @@ app.route('/login').post(async (req, res) => {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
     }
 });
-
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
