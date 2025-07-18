@@ -98,4 +98,5 @@ app.post('/login', async (req, res) => {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
     }
 });
+
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
