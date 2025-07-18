@@ -3,23 +3,32 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
+const path = require('path');
 const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 
 const MAX_USERNAME_LENGTH = 50;
 const MAX_PASSWORD_LENGTH = 255;
 const MIN_PASSWORD_LENGTH = 6;
+
+// Alphanumeric plus underscores and dashes
 const VALID_CHARACTERS = /^[a-zA-Z0-9_-]+$/;
+
 const CHECK_QUERY = 'SELECT * FROM users WHERE username = ? OR email = ?';
 const INSERT_QUERY = 'INSERT INTO users (username, password, email) VALUES (?, ?, ?)';
+const USER_QUERY = 'SELECT * FROM users WHERE username = ?';
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
 
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root',
-    password: 'your_password',
+    user: 'chatuser',
+    password: '1213',
     database: 'chat_app'
 });
 
@@ -59,11 +68,33 @@ app.route('/signup').post(async (req, res) => {
         await db.promise().query(INSERT_QUERY, [username, hashedPassword, email]);
         res.status(StatusCodes.CREATED).json({ message: 'Signup successful' });
     } catch (err) {
+        console.error(err);
         if (err) return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Signup failed' });
     }
-})
-    .all((req, res) => {
-        res.status(StatusCodes.METHOD_NOT_ALLOWED).json({ message: 'Method not allowed' });
-    });
+});
+
+app.route('/login').post(async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'All fields must be nonempty' });
+    }
+
+    try {
+        const [rows] = await db.promise().query(USER_QUERY, [username]);
+        if (!rows.length) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid login' });
+        }
+        const user = rows[0];
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid login' });
+        }
+        return res.status(StatusCodes.OK).json({ message: 'Login successful' });
+    } catch (err) {
+        console.error(err);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+    }
+});
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));
