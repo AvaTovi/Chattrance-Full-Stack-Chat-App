@@ -5,7 +5,7 @@ function Login() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const isLoggedIn = false; // placeholder for now
+  const isLoggedIn = false;
   const handleLogout = () => {
     console.log("Logged out");
     navigate("/login");
@@ -52,13 +52,13 @@ function Login() {
               ) : (
                 <>
                   <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/signup">Sign Up</Link>
+                  </li>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
                     <Link to="/settings">Settings</Link>
                   </li>
                   <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/login">Sign In</Link>
-                  </li>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/signup">Sign Up</Link>
+                    <Link to="/">Back to Home</Link>
                   </li>
                 </>
               )}
@@ -68,7 +68,7 @@ function Login() {
       </div>
 
       {/* Login screen */}
-      <section className="min-h-screen flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-400 via-50% to-orange-400 to-100%">
+      <section className="min-h-screen flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-500 via-50% to-orange-400 to-100%">
         <div className="flex shadow-2xl">
           <div className="flex flex-col items-center justify-center text-center p-20 gap-8 bg-white rounded-2xl">
             <h1 className="text-5xl font-bold">Welcome</h1>
@@ -87,14 +87,15 @@ function Login() {
               <input type="checkbox" />
               <span className="text-base">Remember Password</span>
             </div>
-
             {/* Login Button */}
             <div>
               <button className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Login</button>
               <p className="font-semibold pt-5">Don't have an account? <a href="/signup" className="text-blue-400 hover:underline">Register</a></p>
             </div>
-            <div className="mt-1">
+            <div className="flex flex-col mt-1">
             <a href="/" className="text-blue-400 mt-5 underline hover:underline">Back to Main Menu</a>
+            <br />
+            <a href="/forgotPass" className="text-blue-400 pb-2 underline hover:underline">Forgot Password?</a>
             </div>
           </div>
         </div>
