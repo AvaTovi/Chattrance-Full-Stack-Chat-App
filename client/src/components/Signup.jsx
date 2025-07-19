@@ -4,11 +4,35 @@ import { Link, useNavigate } from "react-router-dom";
 function Signup() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
 
   const isLoggedIn = false; // placeholder
   const handleLogout = () => {
     console.log("Logged out");
     navigate("/login");
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, email }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setMessage('Signup successful');
+      } else {
+        setMessage(`${data.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('An error occured');
+    }
   };
 
   return (
@@ -75,17 +99,29 @@ function Signup() {
             {/* Username */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Username</span>
-              <input type="text" className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+              <input
+                type="text" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
             {/* Password */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Password</span>
-              <input type="text" className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+              <input
+                type="text"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
             {/* Email */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Email</span>
-              <input type="text" className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
             {/* Remember password button */}
             <div className="flex gap-1 items-center">
@@ -98,7 +134,7 @@ function Signup() {
               <button className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Sign Up</button>
             </div>
             <div className="mt-1">
-            <a href="/" className="text-blue-400 mt-5 underline hover:underline">Back to Main Menu</a>
+              <a href="/" className="text-blue-400 mt-5 underline hover:underline">Back to Main Menu</a>
             </div>
           </div>
         </div>
