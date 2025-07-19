@@ -10,7 +10,7 @@ const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 const MAX_USERNAME_LENGTH = 50;
 const MAX_PASSWORD_LENGTH = 255;
 const MIN_PASSWORD_LENGTH = 6;
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Alphanumeric plus underscores and dashes
 const VALID_CHARACTERS = /^[a-zA-Z0-9_-]+$/;
