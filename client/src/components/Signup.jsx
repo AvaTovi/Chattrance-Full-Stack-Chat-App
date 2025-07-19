@@ -131,7 +131,9 @@ function Signup() {
 
             {/* Sign Up Button */}
             <div>
-              <button className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Sign Up</button>
+              <button
+                onClick={handleSignup}
+                className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Sign Up</button>
             </div>
             <div className="mt-1">
               <a href="/" className="text-blue-400 mt-5 underline hover:underline">Back to Main Menu</a>
