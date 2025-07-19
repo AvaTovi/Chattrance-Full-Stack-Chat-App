@@ -25,7 +25,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, '../client/build')));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 const db = mysql.createConnection({
@@ -48,7 +48,7 @@ app.post('/signup', async (req, res) => {
     }
 
     if (!VALID_CHARACTERS.test(username) || !VALID_CHARACTERS.test(password)) {
-        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Username and password must be alphanumeric, underscore, or dash only' })
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Username and password must be alphanumeric, underscore, or dash only' });
     }
 
     if (!validator.isEmail(email, {
