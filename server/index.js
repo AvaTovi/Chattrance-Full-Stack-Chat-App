@@ -21,6 +21,7 @@ const USER_QUERY = 'SELECT * FROM users WHERE username = ?';
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.use(express.static(path.join(__dirname, '../client/build')));
 
 app.get('/', (req, res) => {
