@@ -31,7 +31,7 @@ export default function StartQueue() {
             Waiting for your friend to join…
           </div>
           <div className="flex flex-col pt-4">
-          <a href="/">❮❮ Back to Main Menu</a>
+            <a href="/">❮❮ Back to Main Menu</a>
           </div>
         </div>
       </div>

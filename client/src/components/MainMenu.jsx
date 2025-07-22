@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function MainMenu( isLoggedIn, handleLogout) {
+function MainMenu(isLoggedIn, handleLogout) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -13,10 +13,10 @@ function MainMenu( isLoggedIn, handleLogout) {
   const handleStartQueueClick = () => {
     navigate("/startQueue");
   };
-// Just for testing
-const handleJoinQueueClick = () => {
-  navigate("/joinQueue");
-};
+  // Just for testing
+  const handleJoinQueueClick = () => {
+    navigate("/joinQueue");
+  };
 
   return (
     <div className="h-screen flex flex-col bg-black text-white">
@@ -42,33 +42,33 @@ const handleJoinQueueClick = () => {
           </button>
 
           {isOpen && (
-          <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
-            {isLoggedIn ? (
-              <>
-                <li className="block px-4 py-2 hover:bg-gray-200">
-                  <Link to="/account">Account Info</Link>
-                </li>
-                <li className="block px-4 py-2 hover:bg-gray-200">
-                  <Link to="/settings">Settings</Link>
-                </li>
-                <li className="block px-4 py-2 hover:bg-gray-200 text-red-600">
-                  <button onClick={handleLogout} className="w-full text-left">
-                    Sign Out
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className="block px-4 py-2 hover:bg-gray-200">
-                  <Link to="/settings">Settings</Link>
-                </li>
-                <li className="block px-4 py-2 hover:bg-gray-200">
-                  <Link to="/login">Log In</Link>
-                </li>
-              </>
-            )}
-          </ul>
-        )}
+            <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
+              {isLoggedIn ? (
+                <>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/account">Account Info</Link>
+                  </li>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/settings">Settings</Link>
+                  </li>
+                  <li className="block px-4 py-2 hover:bg-gray-200 text-red-600">
+                    <button onClick={handleLogout} className="w-full text-left">
+                      Sign Out
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/settings">Settings</Link>
+                  </li>
+                  <li className="block px-4 py-2 hover:bg-gray-200">
+                    <Link to="/login">Log In</Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          )}
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import MainMenu from "./MainMenu"; 
+import MainMenu from "./MainMenu";
 import { useNavigate } from "react-router-dom";
 
 export default function JoinQueue() {
@@ -55,7 +55,7 @@ export default function JoinQueue() {
             Waiting for host to accept…
           </p>
           <div className="flex flex-col pt-4">
-          <a href="/">❮❮ Back to Main Menu</a>
+            <a href="/">❮❮ Back to Main Menu</a>
           </div>
         </div>
       </div>
