@@ -80,7 +80,7 @@ function Login() {
             {/* Password */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Password</span>
-              <input type="text" className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+              <input type="password" className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
             {/* Remember password button */}
             <div className="flex gap-1 items-center">
@@ -93,9 +93,9 @@ function Login() {
               <p className="font-semibold pt-5">Don't have an account? <a href="/signup" className="text-blue-400 hover:underline">Register</a></p>
             </div>
             <div className="flex flex-col mt-1">
-            <a href="/" className="text-blue-400 mt-5 underline hover:underline">Back to Main Menu</a>
-            <br />
-            <a href="/forgotPass" className="text-blue-400 pb-2 underline hover:underline">Forgot Password?</a>
+              <a href="/" className="text-blue-400 mt-5 underline hover:underline">Back to Main Menu</a>
+              <br />
+              <a href="/forgotPass" className="text-blue-400 pb-2 underline hover:underline">Forgot Password?</a>
             </div>
           </div>
         </div>

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { StatusCodes } from 'http-status-codes';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 function Signup() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -24,10 +27,14 @@ function Signup() {
         body: JSON.stringify({ username, password, email }),
       });
       const data = await response.json();
-      if (response.ok) {
-        setMessage('Signup successful');
-      } else {
-        setMessage(`${data.message}`);
+      setMessage(`${data.message}`);
+      if (response.status === StatusCodes.CREATED) {
+        setTimeout(() => {
+          setMessage('Redirecting...');
+        }, 1000);
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
       }
     } catch (err) {
       console.error(err);
@@ -94,31 +101,40 @@ function Signup() {
       {/* Signup screen */}
       <section className="min-h-screen flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-400 via-50% to-orange-400 to-100%">
         <div className="flex shadow-2xl">
-          <div className="flex flex-col items-center justify-center text-center p-20 gap-8 bg-white rounded-2xl">
+          <div className="flex flex-col items-center text-center p-20 gap-8 bg-white rounded-2xl w-full">
             <h1 className="text-5xl font-bold">Create Account</h1>
             {/* Username */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Username</span>
               <input
-                type="text" 
+                type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
             {/* Password */}
-            <div className="flex flex-col text-2xl text-left gap-1">
+            <div className="flex flex-col text-2xl text-left gap-1 relative">
               <span>Password</span>
-              <input
-                type="text"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+              <div className="flex w-full items-center">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="rounded-md pt-1 pb-1 pl-1 pr-9 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  className="absolute right-2 ml-2 text-blue-500 hover:text-blue-700"
+                >
+                  {showPassword ? <FiEye size={24} /> : <FiEyeOff size={24} />}
+                </button>
+              </div>
             </div>
             {/* Email */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Email</span>
               <input
-                type="text"
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
@@ -128,6 +144,8 @@ function Signup() {
               <input type="checkbox" />
               <span className="text-base">Remember Password</span>
             </div>
+
+            {message && <p className="text-red-600 font-semibold">{message}</p>}
 
             {/* Sign Up Button */}
             <div>
