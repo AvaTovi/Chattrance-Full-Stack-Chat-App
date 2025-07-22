@@ -9,6 +9,14 @@ function MainMenu( isLoggedIn, handleLogout) {
     // Temporary routing logic: just go to login page for now
     navigate("/login");
   };
+  // Just for testing
+  const handleStartQueueClick = () => {
+    navigate("/startQueue");
+  };
+// Just for testing
+const handleJoinQueueClick = () => {
+  navigate("/joinQueue");
+};
 
   return (
     <div className="h-screen flex flex-col bg-black text-white">
@@ -87,6 +95,20 @@ function MainMenu( isLoggedIn, handleLogout) {
             style={{ fontFamily: 'Outfit' }}
           >
             Join Chat
+          </button>
+          <button
+            onClick={handleStartQueueClick}
+            className="px-6 py-2 bg-gray-300 text-black rounded"
+            style={{ fontFamily: 'Outfit' }}
+          >
+            Testing: Start chat queue
+          </button>
+          <button
+            onClick={handleJoinQueueClick}
+            className="px-6 py-2 bg-gray-300 text-black rounded"
+            style={{ fontFamily: 'Outfit' }}
+          >
+            Testing: join chat queue
           </button>
 
           <Link to="/signup" className="mt-4 text-blue-400 underline">
