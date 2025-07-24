@@ -95,7 +95,7 @@ app.post('/signup', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    const { username, password, remember } = req.body;
+    const { username, password, remember: rememberPassword } = req.body;
 
     if (!username || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'All fields must be nonempty' });
@@ -112,10 +112,10 @@ app.post('/login', async (req, res) => {
             return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid login' });
         }
 
-        if (remember) {
+        if (!rememberPassword) {
             req.session.cookie.maxAge = THREE_DAYS;
         } else {
-            req.session.cookie.expires = false;
+            req.sessio.cookie.maxAge = null;
         }
 
         req.session.user = {
