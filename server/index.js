@@ -115,7 +115,7 @@ app.post('/login', async (req, res) => {
         if (!rememberPassword) {
             req.session.cookie.maxAge = THREE_DAYS;
         } else {
-            req.sessio.cookie.maxAge = null;
+            req.session.cookie.maxAge = null;
         }
 
         req.session.user = {
