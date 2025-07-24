@@ -1,9 +1,9 @@
 const express = require('express');
-const cors = require('cors');
 const mysql = require('mysql2');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const path = require('path');
+const session = require('express-session');
 require('dotenv').config();
 const { StatusCodes, ReasonPhrases } = require('http-status-codes');
 
@@ -11,6 +11,7 @@ const MAX_USERNAME_LENGTH = 50;
 const MAX_PASSWORD_LENGTH = 255;
 const MIN_PASSWORD_LENGTH = 6;
 const PORT = process.env.PORT || 3001;
+const THREE_DAYS = 1000 * 60 * 60 * 24 * 3;
 
 // Alphanumeric plus underscores and dashes
 const VALID_CHARACTERS = /^[a-zA-Z0-9_-]+$/;
@@ -21,11 +22,20 @@ const USER_QUERY = 'SELECT * FROM users WHERE username = ?';
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false
+    }
+}));
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.get('/{*any}', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 const db = mysql.createConnection({
@@ -38,6 +48,14 @@ const db = mysql.createConnection({
 db.connect(err => {
     if (err) throw err;
     console.log('Connected to MySQL');
+});
+
+app.get('/me', (req, res) => {
+    if (req.session.user) {
+        return res.status(StatusCodes.OK).json({ user: req.session.user });
+    } else {
+        return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Not logged in' });
+    }
 });
 
 app.post('/signup', async (req, res) => {
@@ -77,7 +95,7 @@ app.post('/signup', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, remember } = req.body;
 
     if (!username || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'All fields must be nonempty' });
@@ -93,11 +111,35 @@ app.post('/login', async (req, res) => {
         if (!isMatch) {
             return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid login' });
         }
+
+        if (remember) {
+            req.session.cookie.maxAge = THREE_DAYS;
+        } else {
+            req.session.cookie.expires = false;
+        }
+
+        req.session.user = {
+            id: user.id,
+            username: user.username,
+            email: user.email
+        };
+
         return res.status(StatusCodes.OK).json({ message: 'Login successful' });
     } catch (err) {
         console.error(err);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
     }
+});
+
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error(err);
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Logout failed' });
+        }
+        res.clearCookie('connect.sid');
+        return res.status(StatusCodes.OK).json({ message: 'Logout successful' });
+    });
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

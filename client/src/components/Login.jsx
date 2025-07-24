@@ -3,9 +3,37 @@ import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
   const [isOpen, setIsOpen] = useState(false);
+  const [rememberPassword, setRememberPassword] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-  const isLoggedIn = false;
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, rememberPassword}),
+      });
+      const data = await response.json();
+      setMessage(`${data.message}`);
+      if (response.ok) {
+        setTimeout(() => {
+          setMessage('Redirecting...');
+        }, 1000);
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('An error occured');
+    }
+  };
+
   const handleLogout = () => {
     console.log("Logged out");
     navigate("/login");
@@ -75,21 +103,38 @@ function Login() {
             {/* Username */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Username</span>
-              <input type="text" className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
             {/* Password */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Password</span>
-              <input type="password" className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
             {/* Remember password button */}
             <div className="flex gap-1 items-center">
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={rememberPassword}
+                onChange={(e) => {setRememberPassword(e.target.checked)}}
+              />
               <span className="text-base">Remember Password</span>
             </div>
+
+            {message && <p className="text-red-600 font-semibold">{message}</p>}
+
             {/* Login Button */}
             <div>
-              <button className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Login</button>
+              <button
+                onClick={handleLogin}
+                className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Login</button>
               <p className="font-semibold pt-5">Don't have an account? <a href="/signup" className="text-blue-400 hover:underline">Register</a></p>
             </div>
             <div className="flex flex-col mt-1">
