@@ -6,7 +6,7 @@ function ForgotPass() {
   const navigate = useNavigate();
 
   const isLoggedIn = false;
-  const handleLogout = () => {
+  const handleLogout = async () => {
     console.log("Logged out");
     navigate("/login");
   };

@@ -11,7 +11,7 @@ const MAX_USERNAME_LENGTH = 50;
 const MAX_PASSWORD_LENGTH = 255;
 const MIN_PASSWORD_LENGTH = 6;
 const PORT = process.env.PORT || 3001;
-const THREE_DAYS = 1000 * 60 * 60 * 24 * 3;
+const LOGIN_DURATION = 1000 * 60 * 60 * 24 * 30;
 
 // Alphanumeric plus underscores and dashes
 const VALID_CHARACTERS = /^[a-zA-Z0-9_-]+$/;
@@ -87,7 +87,7 @@ app.post('/signup', async (req, res) => {
         if (rows.length) return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Username or email already exists' });
         const hashedPassword = await bcrypt.hash(password, 10);
         await db.promise().query(INSERT_QUERY, [username, hashedPassword, email]);
-        res.status(StatusCodes.CREATED).json({ message: 'Signup successful' });
+        res.status(StatusCodes.OK).json({ message: 'Signup successful' });
     } catch (err) {
         console.error(err);
         if (err) return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Signup failed' });
@@ -95,7 +95,7 @@ app.post('/signup', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    const { username, password, remember: rememberPassword } = req.body;
+    const { username, password, rememberPassword } = req.body;
 
     if (!username || !password) {
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'All fields must be nonempty' });
@@ -112,11 +112,7 @@ app.post('/login', async (req, res) => {
             return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid login' });
         }
 
-        if (!rememberPassword) {
-            req.session.cookie.maxAge = THREE_DAYS;
-        } else {
-            req.session.cookie.maxAge = null;
-        }
+        if (rememberPassword) req.session.cookie.maxAge = LOGIN_DURATION;
 
         req.session.user = {
             id: user.id,

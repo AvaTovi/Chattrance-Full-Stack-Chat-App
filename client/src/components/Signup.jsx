@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { StatusCodes } from 'http-status-codes';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 function Signup() {
@@ -28,7 +27,7 @@ function Signup() {
       });
       const data = await response.json();
       setMessage(`${data.message}`);
-      if (response.status === StatusCodes.CREATED) {
+      if (response.ok) {
         setTimeout(() => {
           setMessage('Redirecting...');
         }, 1000);

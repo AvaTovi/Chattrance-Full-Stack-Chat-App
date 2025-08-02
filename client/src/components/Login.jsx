@@ -17,7 +17,7 @@ function Login() {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, rememberPassword}),
+        body: JSON.stringify({ username, password, rememberPassword }),
       });
       const data = await response.json();
       setMessage(`${data.message}`);
@@ -64,33 +64,15 @@ function Login() {
           </button>
           {isOpen && (
             <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
-              {isLoggedIn ? (
-                <>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/account">Account Info</Link>
-                  </li>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/settings">Settings</Link>
-                  </li>
-                  <li className="block px-4 py-2 hover:bg-gray-200 text-red-600">
-                    <button onClick={handleLogout} className="w-full text-left">
-                      Sign Out
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/signup">Sign Up</Link>
-                  </li>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/settings">Settings</Link>
-                  </li>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/">Back to Home</Link>
-                  </li>
-                </>
-              )}
+              <li className="block px-4 py-2 hover:bg-gray-200">
+                <Link to="/signup">Sign Up</Link>
+              </li>
+              <li className="block px-4 py-2 hover:bg-gray-200">
+                <Link to="/settings">Settings</Link>
+              </li>
+              <li className="block px-4 py-2 hover:bg-gray-200">
+                <Link to="/">Back to Home</Link>
+              </li>
             </ul>
           )}
         </div>
@@ -124,7 +106,7 @@ function Login() {
               <input
                 type="checkbox"
                 checked={rememberPassword}
-                onChange={(e) => {setRememberPassword(e.target.checked)}}
+                onChange={(e) => { setRememberPassword(e.target.checked) }}
               />
               <span className="text-base">Remember Password</span>
             </div>
