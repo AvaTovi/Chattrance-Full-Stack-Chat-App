@@ -1,20 +1,44 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { useAuth } from './AuthProvider'
 
 function Signup() {
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    passwordCheck: "",
+    email: ""
+  });
+  
   const [isOpen, setIsOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { authUser, logout } = useAuth();
+  const isLoggedIn = Boolean(authUser);
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
-  const isLoggedIn = false; // placeholder
-  const handleLogout = () => {
-    console.log("Logged out");
+
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
+  };
+
+  useEffect(() => {
+    setPasswordsMatch(form.password === form.passwordCheck);
+    if (!passwordsMatch) {
+      setMessage('Passwords do not match');
+    } else {
+      setMessage('');
+    }
+  }, [form.password, form.passwordCheck, passwordsMatch]);
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handleSignup = async (e) => {
@@ -23,7 +47,11 @@ function Signup() {
       const response = await fetch('/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, email }),
+        body: JSON.stringify({
+          username: form.username,
+          password: form.password,
+          email: form.email
+        }),
       });
       const data = await response.json();
       setMessage(`${data.message}`);
@@ -42,9 +70,9 @@ function Signup() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-black">
+    <div className="h-screen bg-black">
       {/* Header */}
-      <div className="w-full px-6 py-4 flex items-center justify-between">
+      <header className="w-full px-6 py-4 flex items-center justify-between">
         {/* Logo & Title */}
         <div className="flex items-center">
           <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
@@ -95,53 +123,66 @@ function Signup() {
             </ul>
           )}
         </div>
-      </div>
+      </header>
 
       {/* Signup screen */}
       <section className="min-h-screen flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-400 via-50% to-orange-400 to-100%">
-        <div className="flex shadow-2xl">
-          <div className="flex flex-col items-center text-center p-20 gap-8 bg-white rounded-2xl w-full">
+        <div className="">
+          <div className="flex flex-col items-center p-20 gap-8 bg-white rounded-2xl w-full">
             <h1 className="text-5xl font-bold">Create Account</h1>
             {/* Username */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Username</span>
               <input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                name="username"
+                value={form.username}
+                onChange={handleChange}
                 className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
             {/* Password */}
-            <div className="flex flex-col text-2xl text-left gap-1 relative">
+            <div className="flex flex-col text-2xl text-left gap-1">
               <span>Password</span>
-              <div className="flex w-full items-center">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="rounded-md pt-1 pb-1 pl-1 pr-9 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(prev => !prev)}
-                  className="absolute right-2 ml-2 text-blue-500 hover:text-blue-700"
-                >
-                  {showPassword ? <FiEye size={24} /> : <FiEyeOff size={24} />}
-                </button>
-              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
             </div>
+
+            {/* Show Password Button */}
+            <div className="flex items-center">
+              <button
+                type="button"
+                onClick={() => setShowPassword(prev => !prev)}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                {showPassword ? <FiEye size={24} /> : <FiEyeOff size={24} />}
+              </button>
+              <span className="ml-2">Show Password</span>
+            </div>
+
+            {/* Password Check */}
+            <div className="flex flex-col text-2xl text-left gap-1">
+              <span>Confirm Password</span>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="passwordCheck"
+                value={form.passwordCheck}
+                onChange={handleChange}
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+            </div>
+
             {/* Email */}
             <div className="flex flex-col text-2xl text-left gap-1">
               <span>Email</span>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                value={form.email}
+                onChange={handleChange}
                 className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
-            </div>
-            {/* Remember password button */}
-            <div className="flex gap-1 items-center">
-              <input type="checkbox" />
-              <span className="text-base">Remember Password</span>
             </div>
 
             {message && <p className="text-red-600 font-semibold">{message}</p>}
@@ -150,6 +191,7 @@ function Signup() {
             <div>
               <button
                 onClick={handleSignup}
+                disabled={!passwordsMatch}
                 className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Sign Up</button>
             </div>
             <div className="mt-1">

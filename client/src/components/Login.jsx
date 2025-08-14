@@ -1,43 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthProvider";
 
 function Login() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [rememberPassword, setRememberPassword] = useState(false);
+  const { login, isLoggedIn, loading } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberPassword, setRememberPassword] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  const isLoggedIn = false;
+
+  useEffect(() => {
+    if (!loading && isLoggedIn) {
+      navigate('/');
+    }
+  }, [isLoggedIn, loading]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch('/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, rememberPassword }),
-      });
-      const data = await response.json();
-      setMessage(`${data.message}`);
-      if (response.ok) {
-        setTimeout(() => {
-          setMessage('Redirecting...');
-        }, 1000);
-        setTimeout(() => {
-          navigate('/');
-        }, 1500);
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage('An error occured');
+    const res = await login(username, password, rememberPassword);
+    setMessage(res.message);
+    if (res.success) {
+      setTimeout(() => {
+        setMessage('Redirecting...');
+      }, 1000);
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
     }
-  };
-
-  const handleLogout = () => {
-    console.log("Logged out");
-    navigate("/login");
   };
 
   return (

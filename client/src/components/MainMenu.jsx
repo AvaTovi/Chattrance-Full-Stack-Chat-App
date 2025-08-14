@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthProvider";
 
-function MainMenu(isLoggedIn, handleLogout) {
+function MainMenu() {
+  const { authUser, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    await logout();
+  };
+
 
   const handleChatClick = () => {
     // Temporary routing logic: just go to login page for now
@@ -43,7 +51,7 @@ function MainMenu(isLoggedIn, handleLogout) {
 
           {isOpen && (
             <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
-              {isLoggedIn ? (
+              {authUser ? (
                 <>
                   <li className="block px-4 py-2 hover:bg-gray-200">
                     <Link to="/account">Account Info</Link>
