@@ -3,19 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 
 function Login() {
-  const { login, isLoggedIn, loading } = useAuth();
+  const { login, authUser, loading } = useAuth();
+  const isLoggedIn = Boolean(authUser);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberPassword, setRememberPassword] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && isLoggedIn) {
-      navigate('/');
-    }
-  }, [isLoggedIn, loading]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

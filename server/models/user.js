@@ -74,7 +74,7 @@ async function deleteResetToken(user_id) {
         'DELETE FROM reset_tokens WHERE user_id = ?',
         [user_id]
     );
-    return result.affectedRows === 1;
+    return result.affectedRows > 0;
 }
 
 async function updatePassword(user_id, password) {

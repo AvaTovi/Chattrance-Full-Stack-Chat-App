@@ -1,6 +1,16 @@
-export const SIGNUP = '/auth/signup';
-export const LOGIN  = '/auth/login';
-export const LOGOUT = '/auth/logout';
-export const USER   = '/auth/user';
-export const REQUEST_RESET = '/auth/request-reset';
-export const RESET_PASSWORD = '/auth/password-reset';
+// Backend API routes
+export const API_ROUTES = {
+  SIGNUP: '/auth/signup',
+  LOGIN: '/auth/login',
+  LOGOUT: '/auth/logout',
+  USER: '/auth/user',
+  REQUEST_RESET: '/auth/request-reset',   // send email
+  RESET_PASSWORD: '/auth/password-reset', // actually reset password
+};
+
+// Frontend routes
+export const FRONTEND_ROUTES = {
+  SIGNUP: '/signup',
+  LOGIN: '/login',
+  RESET_PASSWORD_PAGE: '/auth/reset-password', // page with the form
+};

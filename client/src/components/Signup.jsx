@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from './AuthProvider'
+import { FRONTEND_ROUTES } from "../shared/endpoints";
 
 function Signup() {
   const [form, setForm] = useState({
@@ -10,10 +11,10 @@ function Signup() {
     passwordCheck: "",
     email: ""
   });
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { authUser, logout } = useAuth();
+  const { authUser, logout, signup } = useAuth();
   const isLoggedIn = Boolean(authUser);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ function Signup() {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate(FRONTEND_ROUTES.LOGIN);
   };
 
   useEffect(() => {
@@ -43,29 +44,15 @@ function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch('/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: form.username,
-          password: form.password,
-          email: form.email
-        }),
-      });
-      const data = await response.json();
-      setMessage(`${data.message}`);
-      if (response.ok) {
-        setTimeout(() => {
-          setMessage('Redirecting...');
-        }, 1000);
-        setTimeout(() => {
-          navigate('/login');
-        }, 1500);
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage('An error occured');
+    const res = await signup(form.username, form.password, form.email);
+    setMessage(res.message);
+    if (res.success) {
+      setTimeout(() => {
+        setMessage('Redirecting...');
+      }, 1000);
+      setTimeout(() => {
+        navigate(FRONTEND_ROUTES.LOGIN);
+      }, 1500);
     }
   };
 

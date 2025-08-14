@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LOGIN, REQUEST_RESET, RESET_PASSWORD } from '../shared/endpoints';
+import { API_ROUTES } from '../shared/endpoints';
 
 function ForgotPass() {
   const [email, setEmail] = useState('');
@@ -9,7 +9,7 @@ function ForgotPass() {
 
   const handleReset = async () => {
     try {
-      const res = await fetch(REQUEST_RESET, {
+      const res = await fetch(`/api/${API_ROUTES.REQUEST_RESET}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

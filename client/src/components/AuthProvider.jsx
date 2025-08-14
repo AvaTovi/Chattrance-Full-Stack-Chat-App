@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
-import { LOGIN, LOGOUT, USER } from '../shared/endpoints';
+import { API_ROUTES, FRONTEND_ROUTES } from '../shared/endpoints';
 
 const AuthContext = React.createContext();
+
+const apiUrl = (route) => `/api${route}`;
+const USER = apiUrl(API_ROUTES.USER);
+const LOGIN = apiUrl(API_ROUTES.LOGIN);
+const LOGOUT = apiUrl(API_ROUTES.LOGOUT);
+const SIGNUP = apiUrl(API_ROUTES.SIGNUP);
 
 export function useAuth() {
     return useContext(AuthContext);
@@ -16,26 +22,24 @@ export function AuthProvider({ children }) {
     }
 
     useEffect(() => {
-        async function checkUser() {
-            try {
-                const res = await fetch((USER), {
-                    credentials: 'include'
-                });
-                if (res.ok) {
-                    const userData = await res.json();
-                    setAuthUser(userData.user);
-                } else {
-                    clearAuth();
-                }
-            } catch (err) {
-                clearAuth();
-                console.error(`Error fetching ${USER}`, err);
-            } finally {
-                setLoading(false);
-            }
-        }
         checkUser();
     }, []);
+
+    async function signup(username, password, email) {
+        try {
+            const res = await fetch(SIGNUP, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, email })
+            });
+            const data = await res.json();
+            return { success: res.ok, message: data.message };
+        } catch (err) {
+            console.error('Signup error:', err);
+            return { success: false, message: err.message };
+        }
+    }
 
     async function login(username, password, rememberPassword) {
         try {
@@ -46,11 +50,10 @@ export function AuthProvider({ children }) {
                 body: JSON.stringify({ username, password, rememberPassword })
             });
             const data = await res.json();
-            if (!res.ok) {
-                return { success: false, message: data.message };
+            if (res.ok) {
+                setAuthUser(data.user);
             }
-            setAuthUser(data.user);
-            return { success: true, message: data.message };
+            return { success: res.ok, message: data.message };
         } catch (err) {
             console.error('Login error:', err);
             return { success: false, message: err.message };
@@ -66,18 +69,37 @@ export function AuthProvider({ children }) {
             const data = await res.json();
             if (res.ok) {
                 clearAuth();
-                return { success: true, message: data.message }
             }
-            return { success: false, message: data.message };
+            return { success: res.ok, message: data.message };
         } catch (err) {
             console.error('Logout error:', err);
             return { success: false, message: err.message };
         }
     }
 
+    async function checkUser() {
+        try {
+            const res = await fetch((USER), {
+                credentials: 'include'
+            });
+            if (res.ok) {
+                const userData = await res.json();
+                setAuthUser(userData.user);
+            } else {
+                clearAuth();
+            }
+        } catch (err) {
+            clearAuth();
+            console.error('Check User error:', err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const value = useMemo(() => ({
         authUser,
         loading,
+        signup,
         login,
         logout,
     }), [authUser, loading]);

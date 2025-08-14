@@ -25,7 +25,7 @@ app.use(session({
 }));
 
 const authRouter = require('./routes/auth');
-app.use('/', authRouter);
+app.use('/api', authRouter);
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.get('/{*any}', (req, res) => {
