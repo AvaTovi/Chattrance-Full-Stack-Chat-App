@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import MainMenu from "./MainMenu";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import MainMenu from "./MainMenu";
 
 export default function JoinQueue() {
   const [panelOpen, setPanelOpen] = useState(false);

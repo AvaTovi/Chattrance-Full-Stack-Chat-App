@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(60) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS messages (
@@ -14,15 +14,21 @@ CREATE TABLE IF NOT EXISTS messages (
     user_id INT UNSIGNED NOT NULL,    -- the receiver
     sender_id INT UNSIGNED NOT NULL,  -- the sender
     content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS reset_tokens (
-    token varchar(255) UNIQUE not null,
-    created_at TIMESTAMP not null,
-    expires_at TIMESTAMP not null,
-    user_id int UNSIGNED not null,
-    PRIMARY KEY(user_id, token)
+    user_id INT UNSIGNED PRIMARY KEY,
+    token CHAR(64) UNIQUE NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE EVENT IF NOT EXISTS cleanup_reset_tokens
+    ON SCHEDULE EVERY 60 MINUTE
+    COMMENT 'Delete expired reset tokens'
+    DO
+        DELETE FROM reset_tokens WHERE expires_at <= NOW();

@@ -1,29 +1,25 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { API_ROUTES } from '../shared/endpoints';
+import { FRONTEND_ROUTES } from "../shared/endpoints";
+import { useAuth } from "./AuthProvider";
 
 function ForgotPass() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const { authUser, requestReset, logout } = useAuth();
+  const isLoggedIn = Boolean(authUser);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleReset = async () => {
-    try {
-      const res = await fetch(`/api/${API_ROUTES.REQUEST_RESET}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json();
-    } catch (err) {
-      console.error(err);
-    }
+  const handleReset = async (e) => {
+    e.preventDefault();
+    const res = await requestReset(email);
+    setMessage(res.message);
   };
 
-  const isLoggedIn = false;
   const handleLogout = async () => {
-    console.log("Logged out");
-    navigate(LOGIN);
+    await logout();
+    navigate(FRONTEND_ROUTES.LOGIN);
   };
 
   return (
@@ -44,6 +40,7 @@ function ForgotPass() {
         {/* Hamburger Menu */}
         <div className="relative">
           <button
+            type="button"
             onClick={() => setIsOpen(!isOpen)}
             className="flex flex-col h-6 w-6 justify-between items-center group"
           >
@@ -64,6 +61,7 @@ function ForgotPass() {
                   </li>
                   <li className="block px-4 py-2 hover:bg-gray-200 text-red-600">
                     <button
+                      type="button"
                       onClick={handleLogout}
                       className="w-full text-left"
                     >
@@ -91,18 +89,33 @@ function ForgotPass() {
       {/* Reset Password frame */}
       <section className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="flex flex-col items-center justify-center text-center font-mono p-20 gap-8 bg-white rounded-2xl">
-          <div className="text-4xl font-extrabold underline">Reset Password</div>
-          <div className="text-2xl font-bold text-gray-400">Provide the email address associated with your account to recover your password</div>
+          <div className="text-4xl font-extrabold underline">
+            Reset Password
+          </div>
+          <div className="text-2xl font-bold text-gray-400">
+            Provide the email address associated with your account to recover
+            your password
+          </div>
           <div className="flex flex-col text-2xl text-left gap-1">
             <span>Email</span>
-            <input type="text" value={email} onChange={e => setEmail(e.target.value)}
-            className="rounded-md p-1 border-2 outline-none text-black focus:border-blue-400 focus:bg-slate-500" />
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-md p-1 border-2 outline-none text-black focus:border-blue-400 focus:bg-slate-500"
+            />
             <button
-            onClick={handleReset}
-            className="bg-blue-500 hover:bg-blue-700 mt-3 text-white rounded px-4 py-2">Reset Password</button>
+              type="button"
+              onClick={handleReset}
+              className="bg-blue-500 hover:bg-blue-700 mt-3 text-white rounded px-4 py-2"
+            >
+              Reset Password
+            </button>
           </div>
         </div>
       </section>
+
+      {message && <p className="text-red-600 font-semibold">{message}</p>}
     </div>
   );
 }

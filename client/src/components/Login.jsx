@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 
 function Login() {
-  const { login, authUser, loading } = useAuth();
-  const isLoggedIn = Boolean(authUser);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberPassword, setRememberPassword] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -18,10 +17,10 @@ function Login() {
     setMessage(res.message);
     if (res.success) {
       setTimeout(() => {
-        setMessage('Redirecting...');
+        setMessage("Redirecting...");
       }, 1000);
       setTimeout(() => {
-        navigate('/');
+        navigate("/");
       }, 1500);
     }
   };
@@ -33,7 +32,10 @@ function Login() {
         {/* Logo & Title */}
         <div className="flex items-center">
           <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
-          <h1 className="text-2xl text-white font-extrabold" style={{ fontFamily: "Outfit" }}>
+          <h1
+            className="text-2xl text-white font-extrabold"
+            style={{ fontFamily: "Outfit" }}
+          >
             Chattrance
           </h1>
         </div>
@@ -41,6 +43,7 @@ function Login() {
         {/* Hamburger Menu */}
         <div className="relative">
           <button
+            type="button"
             onClick={() => setIsOpen(!isOpen)}
             className="flex flex-col h-6 w-6 justify-between items-center group"
           >
@@ -76,7 +79,8 @@ function Login() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500"
+              />
             </div>
             {/* Password */}
             <div className="flex flex-col text-2xl text-left gap-1">
@@ -85,14 +89,17 @@ function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500" />
+                className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500"
+              />
             </div>
             {/* Remember password button */}
             <div className="flex gap-1 items-center">
               <input
                 type="checkbox"
                 checked={rememberPassword}
-                onChange={(e) => { setRememberPassword(e.target.checked) }}
+                onChange={(e) => {
+                  setRememberPassword(e.target.checked);
+                }}
               />
               <span className="text-base">Remember Password</span>
             </div>
@@ -102,14 +109,33 @@ function Login() {
             {/* Login Button */}
             <div>
               <button
+                type="button"
                 onClick={handleLogin}
-                className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white">Login</button>
-              <p className="font-semibold pt-5">Don't have an account? <a href="/signup" className="text-blue-400 hover:underline">Register</a></p>
+                className="px-10 py-2 text-2xm rounded-md bg-gradient-to-r from-green-500 to-green-400 to-100% hover:from-purple-500 hover:to-yellow-500 text-white"
+              >
+                Login
+              </button>
+              <p className="font-semibold pt-5">
+                Don&apos;t have an account?{" "}
+                <a href="/signup" className="text-blue-400 hover:underline">
+                  Register
+                </a>
+              </p>
             </div>
             <div className="flex flex-col mt-1">
-              <a href="/" className="text-blue-400 mt-5 underline hover:underline">Back to Main Menu</a>
+              <a
+                href="/"
+                className="text-blue-400 mt-5 underline hover:underline"
+              >
+                Back to Main Menu
+              </a>
               <br />
-              <a href="/forgotPass" className="text-blue-400 pb-2 underline hover:underline">Forgot Password?</a>
+              <a
+                href="/forgotPass"
+                className="text-blue-400 pb-2 underline hover:underline"
+              >
+                Forgot Password?
+              </a>
             </div>
           </div>
         </div>
