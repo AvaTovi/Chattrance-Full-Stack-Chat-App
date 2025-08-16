@@ -38,7 +38,7 @@ function Signup() {
 			}, 1000);
 			setTimeout(() => {
 				navigate(FRONTEND_ROUTES.LOGIN);
-			}, 1500);
+			}, 1000);
 		}
 	};
 

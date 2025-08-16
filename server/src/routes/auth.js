@@ -11,7 +11,7 @@ import {
 	isUserTaken,
 	updatePassword,
 } from "../models/user.js";
-import { API_ROUTES } from "../shared/endpoints.js";
+import { API_ROUTES, FRONTEND_ROUTES } from "../shared/endpoints.js";
 import { LOGIN_DURATION } from "../utils/constants.js";
 import { mailTemplate, sendEmail } from "../utils/email.js";
 
@@ -122,14 +122,14 @@ router.post(REQUEST_RESET, async (req, res) => {
 		}
 		const user = await findByEmail(email);
 		if (user) {
-			const resp = await insertResetToken(user.id);
+			const resp = await insertResetToken(user.user_id);
 			if (resp.status === "ok") {
 				const mailOptions = {
 					email: email,
 					subject: "Chattrance -- Password Reset Link",
 					message: mailTemplate(
 						"We have received a request to reset your password. Please reset your password using the link below.",
-						`${process.env.FRONTEND_URL}/api${REQUEST_RESET}?id=${user.id}&token=${resp.token}`,
+						`${process.env.FRONTEND_URL}:${process.env.APP_PORT}${FRONTEND_ROUTES.RESET_PASSWORD_PAGE}?id=${user.user_id}&token=${resp.token}`,
 						"Reset Password",
 					),
 				};
@@ -149,13 +149,12 @@ router.post(REQUEST_RESET, async (req, res) => {
 
 router.post(RESET_PASSWORD, async (req, res) => {
 	try {
-		const { id, token } = req.params;
+		const { id, token, password } = req.body;
 		if (!id || !token) {
 			return res
 				.status(StatusCodes.UNAUTHORIZED)
-				.json({ message: "Invalid link" });
+				.json({ message: "Invalid link or expired" });
 		}
-		const { password } = req.body;
 		const error = isValidPassword(password);
 		if (error) {
 			return res.status(StatusCodes.BAD_REQUEST).json({ message: error });

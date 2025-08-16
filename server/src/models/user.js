@@ -1,11 +1,8 @@
-import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
+import crypto from "crypto";
 
-import { dbConnection } from "../db";
-import { SALT_ROUNDS, TOKEN_LIFETIME, TOKEN_SIZE } from "../utils/constants";
-
-dotenv.config();
+import { dbConnection } from "../db.js";
+import { SALT_ROUNDS, TOKEN_LIFETIME, TOKEN_SIZE } from "../utils/constants.js";
 
 export async function findByUsername(username) {
 	const [rows] = await dbConnection
@@ -59,7 +56,7 @@ export async function isUserTaken(username, email) {
 
 export async function insertResetToken(user_id) {
 	const prevToken = await getPasswordResetToken(user_id);
-	if (prevToken && Date.now() - new Date(prevToken.created_at) < TOKEN_LIFETIME) {
+	if (prevToken && Date.now() - new Date(prevToken.created_at).getTime() < TOKEN_LIFETIME) {
 		return { status: "cooldown", token: null };
 	}
 	const token = crypto.randomBytes(TOKEN_SIZE).toString("hex");

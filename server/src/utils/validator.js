@@ -5,7 +5,7 @@ import {
 	MAX_USERNAME_LENGTH,
 	MIN_PASSWORD_LENGTH,
 	VALID_CHARACTERS,
-} from "./constants";
+} from "./constants.js";
 
 export function validateSignup(username, password, email) {
 	if (!username || !password || !email) return "Please fill all fields";

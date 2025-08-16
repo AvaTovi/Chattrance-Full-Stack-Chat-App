@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS messages (
     sender_id INT UNSIGNED NOT NULL, -- the sender
     content TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
 CREATE EVENT IF NOT EXISTS cleanup_reset_tokens

@@ -1,17 +1,20 @@
-import http from "node:http";
-import path from "node:path";
 import dotenv from "dotenv";
 import express from "express";
+import http from "http";
+import path from "path";
 import session from "express-session";
-import { sessionStore } from "./db";
-import authRouter from "./routes/auth";
+
+import { sessionStore } from "./db.js";
+import authRouter from "./routes/auth.js";
 import { setupSocket } from "./socket.js";
 
 dotenv.config();
 
 const app = express();
 
-const APP_PORT = process.env.APP_PORT || 3000;
+const APP_PORT = process.env.APP_PORT || "3000";
+const __dirname = import.meta.dirname;
+const __clientdir = path.join(__dirname, "../../client/build");
 
 app.use(express.json());
 
@@ -30,14 +33,14 @@ app.use(
 );
 app.use("/api", authRouter);
 
-app.use(express.static(path.join(__dirname, "../client/build")));
+app.use(express.static(__clientdir));
 app.get("/{*any}", (_req, res) => {
-	res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+	res.sendFile(path.join(__clientdir, "index.html"));
 });
 
 const server = http.createServer(app);
 const io = setupSocket(server);
 
 app.listen(APP_PORT, () =>
-	console.log(`Server running on http://localhost:${APP_PORT}`),
+	console.log(`Server running on ${process.env.BACKEND_URL}:${APP_PORT}`),
 );

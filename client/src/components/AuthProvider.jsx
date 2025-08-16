@@ -24,7 +24,6 @@ export function AuthProvider({ children }) {
     useEffect(() => {
       checkAuthentication();
     }, []);
-
   }
 
 
@@ -107,15 +106,15 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function resetPassword(password) {
+  async function resetPassword(id, token, password) {
     try {
       const res = await fetch(RESET_PASSWORD, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ id, token, password }),
       });
       const data = await res.json();
-      return { sucess: res.ok, message: data.message };
+      return { success: res.ok, message: data.message };
     } catch (err) {
       console.error("Password reset error:", err);
     }

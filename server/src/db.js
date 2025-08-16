@@ -16,17 +16,12 @@ export const dbConnection = mysql.createPool({
 	password: process.env.DB_PASSWORD,
 	database: process.env.DB_NAME,
 	waitForConnections: true,
-	connectionLimit: process.env.CONNECTION_LIMIT,
+	connectionLimit: process.env.DB_CONNECTION_LIMIT,
 });
 
 export const sessionStore = new MySQLStore({
-	host: process.env.DB_HOST,
-	port: DB_PORT,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASSWORD,
-	database: process.env.DB_NAME,
 	clearExpired: true,
 	checkExpirationInterval: 1000 * 60 * 15, // every 15 minutes
 	expiration: 1000 * 60 * 60 * 24 * 30, // 30 days
-	createDatabaseTable: true,
-});
+	createDatabaseTable: true
+}, dbConnection.promise());

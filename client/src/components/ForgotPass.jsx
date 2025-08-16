@@ -111,10 +111,10 @@ function ForgotPass() {
               Reset Password
             </button>
           </div>
+          {message && <p className="text-red-600 font-semibold">{message}</p>}
         </div>
       </section>
 
-      {message && <p className="text-red-600 font-semibold">{message}</p>}
     </div>
   );
 }
