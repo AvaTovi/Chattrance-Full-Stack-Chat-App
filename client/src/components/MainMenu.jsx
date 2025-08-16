@@ -28,7 +28,7 @@ function MainMenu() {
 	return (
 		<div className="h-screen flex flex-col bg-black text-white">
 			{/* Header */}
-			<div className="w-full px-6 py-4 flex items-center justify-between">
+			<header className="w-full px-6 py-4 flex items-center justify-between">
 				{/* Logo & Title */}
 				<div className="flex items-center">
 					<img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
@@ -84,7 +84,7 @@ function MainMenu() {
 						</ul>
 					)}
 				</div>
-			</div>
+			</header>
 
 			{/* Main Content */}
 			<div className="flex-grow flex items-center justify-center">

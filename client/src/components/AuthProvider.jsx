@@ -16,16 +16,17 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [authUser, setAuthUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  function clearAuth() {
-    setAuthUser(null);
+  const [authUser, setAuthUser] = useState(null);
+  const [loading, setLoading] = useState(process.env.NODE_ENV === "production" ? true : false);
+
+  if (process.env.NODE_ENV === "production") {
+    useEffect(() => {
+      checkAuthentication();
+    }, []);
+
   }
 
-  useEffect(() => {
-    checkUser();
-  }, []);
 
   async function signup(username, password, email) {
     try {
@@ -39,7 +40,6 @@ export function AuthProvider({ children }) {
       return { success: res.ok, message: data.message };
     } catch (err) {
       console.error("Signup error:", err);
-      return { success: false, message: err.message };
     }
   }
 
@@ -58,7 +58,6 @@ export function AuthProvider({ children }) {
       return { success: res.ok, message: data.message };
     } catch (err) {
       console.error("Login error:", err);
-      return { success: false, message: err.message };
     }
   }
 
@@ -70,28 +69,24 @@ export function AuthProvider({ children }) {
       });
       const data = await res.json();
       if (res.ok) {
-        clearAuth();
+        setAuthUser(null);
       }
       return { success: res.ok, message: data.message };
     } catch (err) {
       console.error("Logout error:", err);
-      return { success: false, message: err.message };
     }
   }
 
-  async function checkUser() {
+  async function checkAuthentication() {
     try {
       const res = await fetch(USER, {
-        credentials: "include",
+        credentials: "include"
       });
       if (res.ok) {
         const userData = await res.json();
         setAuthUser(userData.user);
-      } else {
-        clearAuth();
       }
     } catch (err) {
-      clearAuth();
       console.error("Check User error:", err);
     } finally {
       setLoading(false);
@@ -109,7 +104,6 @@ export function AuthProvider({ children }) {
       return { success: res.ok, message: data.message };
     } catch (err) {
       console.error("Request reset error:", err);
-      return { sucess: false, message: err.message };
     }
   }
 
@@ -124,7 +118,6 @@ export function AuthProvider({ children }) {
       return { sucess: res.ok, message: data.message };
     } catch (err) {
       console.error("Password reset error:", err);
-      return { success: false, message: err.message };
     }
   }
 

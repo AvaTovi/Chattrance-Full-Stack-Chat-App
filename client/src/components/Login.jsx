@@ -28,7 +28,7 @@ function Login() {
   return (
     <div className="h-screen flex flex-col bg-black">
       {/* Header */}
-      <div className="w-full px-6 py-4 flex items-center justify-between">
+      <header className="w-full px-6 py-4 flex items-center justify-between">
         {/* Logo & Title */}
         <div className="flex items-center">
           <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
@@ -65,7 +65,7 @@ function Login() {
             </ul>
           )}
         </div>
-      </div>
+      </header>
 
       {/* Login screen */}
       <section className="min-h-screen flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-500 via-50% to-orange-400 to-100%">
@@ -116,7 +116,7 @@ function Login() {
                 Login
               </button>
               <p className="font-semibold pt-5">
-                Don&apos;t have an account?{" "}
+                Don't have an account?{" "}
                 <a href="/signup" className="text-blue-400 hover:underline">
                   Register
                 </a>

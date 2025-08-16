@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { FRONTEND_ROUTES } from "../shared/endpoints";
@@ -9,36 +9,23 @@ function Signup() {
 		username: "",
 		password: "",
 		passwordCheck: "",
-		email: "",
+		email: ""
 	});
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const { authUser, logout, signup } = useAuth();
-	const isLoggedIn = Boolean(authUser);
-	const [passwordsMatch, setPasswordsMatch] = useState(true);
 	const navigate = useNavigate();
 	const [message, setMessage] = useState("");
+	const passwordsMatch = form.password === form.passwordCheck;
 
 	const handleLogout = async () => {
 		await logout();
-		navigate(FRONTEND_ROUTES.LOGIN);
+		navigate(FRONTEND_ROUTES.LOGIN, { replace: true });
 	};
 
-	useEffect(() => {
-		setPasswordsMatch(form.password === form.passwordCheck);
-		if (!passwordsMatch) {
-			setMessage("Passwords do not match");
-		} else {
-			setMessage("");
-		}
-	}, [form.password, form.passwordCheck, passwordsMatch]);
-
 	const handleChange = (e) => {
-		setForm({
-			...form,
-			[e.target.name]: e.target.value,
-		});
+		setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 	};
 
 	const handleSignup = async (e) => {
@@ -83,7 +70,7 @@ function Signup() {
 					</button>
 					{isOpen && (
 						<ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
-							{isLoggedIn ? (
+							{authUser ? (
 								<>
 									<li className="block px-4 py-2 hover:bg-gray-200">
 										<Link to="/account">Account Info</Link>
@@ -183,7 +170,9 @@ function Signup() {
 							/>
 						</div>
 
-						{message && <p className="text-red-600 font-semibold">{message}</p>}
+						<p className="text-red-600 font-semibold">
+							{!passwordsMatch ? "Passwords do not match" : message}
+						</p>
 
 						{/* Sign Up Button */}
 						<div>

@@ -7,7 +7,6 @@ function ForgotPass() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const { authUser, requestReset, logout } = useAuth();
-  const isLoggedIn = Boolean(authUser);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -25,7 +24,7 @@ function ForgotPass() {
   return (
     <div className="h-screen flex flex-col bg-black">
       {/* Header */}
-      <div className="w-full px-6 py-4 flex items-center justify-between">
+      <header className="w-full px-6 py-4 flex items-center justify-between">
         {/* Logo & Title */}
         <div className="flex items-center">
           <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
@@ -51,7 +50,7 @@ function ForgotPass() {
 
           {isOpen && (
             <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
-              {isLoggedIn ? (
+              {authUser ? (
                 <>
                   <li className="block px-4 py-2 hover:bg-gray-200">
                     <Link to="/account">Account Info</Link>
@@ -85,7 +84,7 @@ function ForgotPass() {
             </ul>
           )}
         </div>
-      </div>
+      </header>
       {/* Reset Password frame */}
       <section className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="flex flex-col items-center justify-center text-center font-mono p-20 gap-8 bg-white rounded-2xl">

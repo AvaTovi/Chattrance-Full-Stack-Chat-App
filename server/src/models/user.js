@@ -18,7 +18,7 @@ async function findByUsernameOrEmail(username, email) {
 	const [rows] = await dbConnection
 		.promise()
 		.query(
-			"SELECT id, username, email FROM users WHERE username = ? OR email = ?",
+			"SELECT user_id, username, email FROM users WHERE username = ? OR email = ?",
 			[username, email],
 		);
 	return rows;
@@ -27,18 +27,20 @@ async function findByUsernameOrEmail(username, email) {
 export async function findByEmail(email) {
 	const [rows] = await dbConnection
 		.promise()
-		.query("SELECT id, email FROM users WHERE email = ?", [email]);
+		.query("SELECT user_id, email FROM users WHERE email = ?", [email]);
 	return rows[0] || null;
 }
 
 export async function createUser(username, password, email) {
 	const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+	const createdAt = new Date();
 	const [result] = await dbConnection
 		.promise()
-		.query("INSERT INTO users (username, password, email) VALUES (?, ?, ?)", [
+		.query("INSERT INTO users (username, password, email, created_at) VALUES (?, ?, ?, ?)", [
 			username,
 			hashedPassword,
 			email,
+			createdAt
 		]);
 	return result.affectedRows;
 }
@@ -57,10 +59,7 @@ export async function isUserTaken(username, email) {
 
 export async function insertResetToken(user_id) {
 	const prevToken = await getPasswordResetToken(user_id);
-	if (
-		prevToken &&
-		Date.now() - new Date(prevToken.created_at) < TOKEN_LIFETIME
-	) {
+	if (prevToken && Date.now() - new Date(prevToken.created_at) < TOKEN_LIFETIME) {
 		return { status: "cooldown", token: null };
 	}
 	const token = crypto.randomBytes(TOKEN_SIZE).toString("hex");
@@ -96,7 +95,7 @@ export async function updatePassword(user_id, password) {
 	const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 	const [result] = await dbConnection
 		.promise()
-		.query("UPDATE users SET password = ? WHERE id = ?", [
+		.query("UPDATE users SET password = ? WHERE user_id = ?", [
 			hashedPassword,
 			user_id,
 		]);

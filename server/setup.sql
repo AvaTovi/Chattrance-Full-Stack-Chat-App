@@ -1,22 +1,13 @@
 CREATE DATABASE IF NOT EXISTS chat_app;
+
 USE chat_app;
 
 CREATE TABLE IF NOT EXISTS users (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(60) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS messages (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED NOT NULL,    -- the receiver
-    sender_id INT UNSIGNED NOT NULL,  -- the sender
-    content TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+    created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS reset_tokens (
@@ -24,11 +15,21 @@ CREATE TABLE IF NOT EXISTS reset_tokens (
     token CHAR(64) UNIQUE NOT NULL,
     created_at TIMESTAMP NOT NULL,
     expires_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL, -- the receiver
+    sender_id INT UNSIGNED NOT NULL, -- the sender
+    content TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE EVENT IF NOT EXISTS cleanup_reset_tokens
-    ON SCHEDULE EVERY 60 MINUTE
-    COMMENT 'Delete expired reset tokens'
-    DO
-        DELETE FROM reset_tokens WHERE expires_at <= NOW();
+  ON SCHEDULE EVERY 60 MINUTE
+  COMMENT 'Delete expired reset tokens'
+  DO
+    DELETE FROM reset_tokens WHERE expires_at < NOW();
