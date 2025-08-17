@@ -50,3 +50,20 @@ export function isValidPassword(password) {
 		return "Password must be alphanumeric and may include !, @, $, _, and - characters";
 	return null;
 }
+
+/**
+ * 
+ * @param {string} message 
+ * @returns {string}
+ */
+export function sanitizeMessage(message) {
+	const regex = /[&<>"']/g;
+	const map = {
+		"&": "&amp;",
+		"<": "&lt;",
+		">": "&gt;",
+		"\"": "&quot;",
+		"'": "&apos;"
+	};
+	return message.replace(regex, match => map[match]);
+}

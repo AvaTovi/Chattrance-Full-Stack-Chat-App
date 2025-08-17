@@ -17,6 +17,7 @@ export const ALLOWED_EMAIL_DOMAINS = [
 export const LOGIN_DURATION = 1000 * 60 * 60 * 24 * 30;
 export const MAX_USERNAME_LENGTH = 50;
 export const MAX_PASSWORD_LENGTH = 255;
+export const MESSAGE_SIZE = 250;
 export const MIN_PASSWORD_LENGTH = 6;
 export const SALT_ROUNDS = 10;
 export const TOKEN_SIZE = 20;
