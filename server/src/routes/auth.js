@@ -10,6 +10,7 @@ import {
 	insertResetToken,
 	isUserTaken,
 	updatePassword,
+	verifyResetToken
 } from "../models/user.js";
 import { API_ROUTES, FRONTEND_ROUTES } from "../shared/endpoints.js";
 import { LOGIN_DURATION } from "../utils/constants.js";
@@ -24,8 +25,8 @@ import {
 
 dotenv.config();
 const router = express.Router();
-const { SIGNUP, LOGIN, LOGOUT, USER, REQUEST_RESET, RESET_PASSWORD } =
-	API_ROUTES;
+
+const { SIGNUP, LOGIN, LOGOUT, USER, REQUEST_RESET, RESET_PASSWORD } = API_ROUTES;
 
 router.post(SIGNUP, async (req, res) => {
 	const { username, password, email } = req.body;
@@ -41,8 +42,11 @@ router.post(SIGNUP, async (req, res) => {
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ message: "Username or email already exists" });
 		}
-		const userId = await createUser(username, password, email);
-		res.status(StatusCodes.OK).json({ userId, message: "Signup successful" });
+		const success = await createUser(username, password, email);
+		if (success) {
+			res.status(StatusCodes.OK).json({ message: "Signup successful" });
+		}
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Signup failed" });
 	} catch (err) {
 		console.error(err);
 		return res
@@ -120,16 +124,16 @@ router.post(REQUEST_RESET, async (req, res) => {
 		if (error) {
 			return res.status(StatusCodes.BAD_REQUEST).json({ message: error });
 		}
-		const user = await findByEmail(email);
-		if (user) {
-			const resp = await insertResetToken(user.user_id);
-			if (resp.status === "ok") {
+		const user_id = await findByEmail(email);
+		if (user_id) {
+			const plain_token = await insertResetToken(user_id);
+			if (plain_token) {
 				const mailOptions = {
 					email: email,
 					subject: "Chattrance -- Password Reset Link",
 					message: mailTemplate(
 						"We have received a request to reset your password. Please reset your password using the link below.",
-						`${process.env.FRONTEND_URL}:${process.env.APP_PORT}${FRONTEND_ROUTES.RESET_PASSWORD_PAGE}?id=${user.user_id}&token=${resp.token}`,
+						`${process.env.FRONTEND_URL}:${process.env.APP_PORT}${FRONTEND_ROUTES.RESET_PASSWORD_PAGE}?id=${user_id}&token=${plain_token}`,
 						"Reset Password",
 					),
 				};
@@ -159,10 +163,22 @@ router.post(RESET_PASSWORD, async (req, res) => {
 		if (error) {
 			return res.status(StatusCodes.BAD_REQUEST).json({ message: error });
 		}
-		if (await updatePassword(id, password)) {
-			await deleteResetToken(id);
-			return res.status(StatusCodes.OK).json({ message: "Password updated" });
+		const isMatch = await verifyResetToken(id, token);
+		if (!isMatch) {
+			return res
+				.status(StatusCodes.UNAUTHORIZED)
+				.json({ message: "Invalid link or expired" });
 		}
+		await deleteResetToken(id);
+		const updated = await updatePassword(id, password);
+		if (!updated) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ message: "Server error" });
+		}
+		return res
+			.status(StatusCodes.OK)
+			.json({ message: "Password updated successfully" });
 	} catch (err) {
 		console.error(err);
 		return res
