@@ -26,7 +26,7 @@ function Login() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-black">
+    <div className="h-full flex flex-col bg-black">
       {/* Header */}
       <header className="w-full px-6 py-4 flex items-center justify-between">
         {/* Logo & Title */}
@@ -68,7 +68,7 @@ function Login() {
       </header>
 
       {/* Login screen */}
-      <section className="min-h-screen flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-500 via-50% to-orange-400 to-100%">
+      <section className="h-full flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-500 via-50% to-orange-400 to-100%">
         <div className="flex shadow-2xl">
           <div className="flex flex-col items-center justify-center text-center p-20 gap-8 bg-white rounded-2xl">
             <h1 className="text-5xl font-bold">Welcome</h1>

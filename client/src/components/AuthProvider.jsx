@@ -18,13 +18,16 @@ export function useAuth() {
 export function AuthProvider({ children }) {
 
   const [authUser, setAuthUser] = useState(null);
-  const [loading, setLoading] = useState(process.env.NODE_ENV === "production" ? true : false);
+  const [loading, setLoading] = useState(true);
 
-  if (process.env.NODE_ENV === "production") {
-    useEffect(() => {
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") {
       checkAuthentication();
-    }, []);
-  }
+    } else {
+      setAuthUser({ id: "TEST", username: "TEST", email: "TEST" });
+      setLoading(false);
+    }
+  }, []);
 
 
   async function signup(username, password, email) {
