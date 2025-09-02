@@ -3,16 +3,16 @@ import express from "express";
 import http from "http";
 import path from "path";
 import session from "express-session";
+import { Server } from "socket.io";
 
 import { sessionStore } from "./db.js";
 import authRouter from "./routes/auth.js";
-import { setupSocket } from "./socket.js";
+import { insertMessage, getConversation, getAllConversations, createConversation } from "./models/message.js"
 
 dotenv.config();
 
 const app = express();
 
-const APP_PORT = process.env.APP_PORT || "3000";
 const __dirname = import.meta.dirname;
 const __clientdir = path.join(__dirname, "../../client/build");
 
@@ -31,6 +31,7 @@ app.use(
 		},
 	}),
 );
+
 app.use("/api", authRouter);
 
 app.use(express.static(__clientdir));
@@ -39,8 +40,17 @@ app.get("/{*any}", (_req, res) => {
 });
 
 const server = http.createServer(app);
-const io = setupSocket(server);
+const io = new Server(server);
 
-app.listen(APP_PORT, () =>
+io.on("connection", (socket) => {
+	console.log(`User connected: ${socket.id}`);
+
+	socket.on("send_message", (data) => {
+		socket.broadcast.emit("receive_message", data)
+		console.log(data);
+	});
+});
+
+server.listen(process.env.APP_PORT, () =>
 	console.log(`Server running on ${process.env.BACKEND_URL}:${APP_PORT}`),
 );

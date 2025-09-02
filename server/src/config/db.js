@@ -3,15 +3,15 @@ import expressMySQLSession from "express-mysql-session";
 import session from "express-session";
 import mysql from "mysql2";
 
+import { SESSION_CLEANUP, SESSION_LIFETIME } from "../utils/constants.js";
+
 dotenv.config();
 
 const MySQLStore = expressMySQLSession(session);
 
-const DB_PORT = process.env.DB_PORT || 3306;
-
 export const dbConnection = mysql.createPool({
 	host: process.env.DB_HOST,
-	port: DB_PORT,
+	port: process.env.DB_PORT,
 	user: process.env.DB_USER,
 	password: process.env.DB_PASSWORD,
 	database: process.env.DB_NAME,
@@ -20,7 +20,7 @@ export const dbConnection = mysql.createPool({
 
 export const sessionStore = new MySQLStore({
 	clearExpired: true,
-	checkExpirationInterval: 1000 * 60 * 15, // every 15 minutes
-	expiration: 1000 * 60 * 60 * 24 * 30, // 30 days
+	checkExpirationInterval: SESSION_CLEANUP,
+	expiration: SESSION_LIFETIME,
 	createDatabaseTable: true
 }, dbConnection.promise());

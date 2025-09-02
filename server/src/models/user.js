@@ -6,98 +6,82 @@ import { SALT_ROUNDS, TOKEN_LIFETIME, TOKEN_SIZE } from "../utils/constants.js";
 
 /**
  * 
- * @param {string} username 
  * @param {string} email 
- * @returns {Promise<Array<{ user_id: number, username: string, email: string }>>}
+ * @param {string} name 
+ * @returns {Promise<boolean>}
  */
-async function findByUsernameOrEmail(username, email) {
+export async function isUserTaken(email, name) {
 	const [rows] = await dbConnection
 		.promise()
 		.query(
-			"SELECT user_id, username, email FROM users WHERE username = ? OR email = ?",
-			[username, email],
+			"SELECT 1 FROM users WHERE email = ? OR name = ? LIMIT 1",
+			[email, name]
 		);
-	return rows;
+	return rows.length > 0;
 }
 
 /**
  * 
- * @param {string} username 
- * @returns {Promise<{ user_id: number, username: string, password: string, email: string, created_at: Date } | null>}
+ * @param {string} email 
+ * @returns {Promise<number?>}
  */
-async function findByUsername(username) {
+export async function findUserByEmail(email) {
 	const [rows] = await dbConnection
 		.promise()
-		.query("SELECT * FROM users WHERE username = ?", [username]);
+		.query("SELECT id FROM users WHERE email = ?", [email]);
 	return rows[0] || null;
 }
 
 /**
  * 
  * @param {string} email 
- * @returns {Promise<{ user_id: string } | null>}
- */
-export async function findByEmail(email) {
-	const [rows] = await dbConnection
-		.promise()
-		.query("SELECT user_id FROM users WHERE email = ?", [email]);
-	return rows[0] || null;
-}
-
-/**
- * 
- * @param {string} username 
+ * @param {string} name 
  * @param {string} password 
- * @param {string} email 
  * @returns {Promise<boolean>}
  */
-export async function createUser(username, password, email) {
+export async function createUser(email, name, password) {
 	const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-	const createdAt = new Date();
 	const [result] = await dbConnection
 		.promise()
-		.query("INSERT INTO users (username, password, email, created_at) VALUES (?, ?, ?, ?)", [
-			username,
-			hashedPassword,
+		.query(
+			"INSERT INTO users (email, name, password) VALUES (?, ?, ?)", [
 			email,
-			createdAt
+			name,
+			hashedPassword
 		]);
 	return result.affectedRows > 0;
 }
 
 /**
  * 
- * @param {string} username 
+ * @param {string} name 
  * @param {string} password 
- * @returns {Promise<{ user_id: number, username: string, email: string } | null>}
+ * @returns {Promise<{ id: number, email: string, name: string }?>}
  */
-export async function authenticateUser(username, password) {
-	const user = await findByUsername(username);
+export async function authenticateUser(name, password) {
+	const [rows] = await dbConnection
+		.promise()
+		.query(
+			"SELECT id, email, name, password FROM users WHERE name = ?",
+			[name]
+		);
+
+	const user = rows[0];
 	if (!user) return null;
-	const isMatch = await bcrypt.compare(password, user.password);
-	return isMatch ? { user_id: user.user_id, username: user.username, email: user.email } : null;
-}
+	const { id, email, name, password: hash } = user;
 
-/**
- * 
- * @param {string} username 
- * @param {string} email 
- * @returns {Promise<boolean>}
- */
-export async function isUserTaken(username, email) {
-	const users = await findByUsernameOrEmail(username, email);
-	return users.length > 0;
+	const isMatch = await bcrypt.compare(password, hash);
+	return isMatch ? { id, email, name } : null;
 }
-
 
 /**
  * 
  * @param {string} user_id 
- * @returns { Promise<string | null> }
+ * @returns { Promise<string?> }
  */
 export async function insertResetToken(user_id) {
 	const prevToken = await getPasswordResetToken(user_id);
-	if (prevToken && Date.now() - new Date(prevToken.created_at).getTime() < TOKEN_LIFETIME) {
+	if (prevToken && Date.now() - new Date(prevToken.created).getTime() < TOKEN_LIFETIME) {
 		return null;
 	}
 	const plainToken = crypto.randomBytes(TOKEN_SIZE).toString("hex");
@@ -107,8 +91,14 @@ export async function insertResetToken(user_id) {
 	await dbConnection
 		.promise()
 		.query(
-			"INSERT INTO reset_tokens (token, created_at, expires_at, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE token = VALUES(token), created_at = VALUES(created_at), expires_at = VALUES(expires_at)",
-			[hashedToken, createdAt, expiresAt, user_id],
+			`
+			INSERT INTO reset_tokens (token, user_id, created, expires) VALUES (?, ?, ?, ?)
+			ON DUPLICATE KEY UPDATE
+			token = VALUES(token),
+			created = VALUES(created),
+			expires = VALUES(expires)
+			`,
+			[hashedToken, user_id, createdAt, expiresAt],
 		);
 	return plainToken;
 }
@@ -116,13 +106,13 @@ export async function insertResetToken(user_id) {
 /**
  * 
  * @param {string} user_id 
- * @returns {Promise<{ user_id: number, username: string, email: string } | null>}
+ * @returns {Promise<{ token: string, created: Date, expires: Date }?>}
  */
 async function getPasswordResetToken(user_id) {
 	const [rows] = await dbConnection
 		.promise()
 		.query(
-			"SELECT token, created_at, expires_at from reset_tokens WHERE user_id = ? AND expires_at > NOW()",
+			"SELECT token, created, expires from reset_tokens WHERE user_id = ? AND expires > NOW()",
 			[user_id],
 		);
 	return rows[0] || null;
@@ -146,24 +136,24 @@ export async function deleteResetToken(user_id) {
  */
 export async function verifyResetToken(user_id, plain_token) {
 	const record = await getPasswordResetToken(user_id);
-	const checkToken = crypto.createHash("sha256").update(plain_token).digest("hex");
 	if (!record) { return false };
+	const checkToken = crypto.createHash("sha256").update(plain_token).digest("hex");
 	return checkToken === record.token;
 }
 
 /**
  * 
- * @param {string} user_id 
+ * @param {number} id
  * @param {string} password 
  * @returns {Promise<boolean>}
  */
-export async function updatePassword(user_id, password) {
+export async function updatePassword(id, password) {
 	const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 	const [result] = await dbConnection
 		.promise()
-		.query("UPDATE users SET password = ? WHERE user_id = ?", [
+		.query("UPDATE users SET password = ? WHERE id = ?", [
 			hashedPassword,
-			user_id,
+			id,
 		]);
 	return result.affectedRows > 0;
 }
