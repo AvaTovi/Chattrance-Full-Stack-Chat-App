@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import nodeMailer from "nodemailer";
-import { RESET_PASSWORD_PAGE } from "../shared/frontend-routes";
+import { RESET_PASSWORD_PAGE } from "../shared/frontend-routes.js";
 
 dotenv.config();
 

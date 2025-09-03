@@ -2,7 +2,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-import { FRONTEND_ROUTES } from "../shared/endpoints";
+import { LOGIN } from "../shared/frontend-routes";
 import { useAuth } from "./AuthProvider";
 
 function ResetPass() {
@@ -24,7 +24,7 @@ function ResetPass() {
 
 	const handleLogout = async () => {
 		await logout();
-		navigate(FRONTEND_ROUTES.LOGIN, { replace: true });
+		navigate(LOGIN, { replace: true });
 	};
 
 	const handleChange = (e) => {

@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import io from "socket.io-client";
 
 import { useAuth } from "./AuthProvider";
-import { FRONTEND_ROUTES } from "../shared/endpoints";
+
+import { LOGIN } from "../shared/frontend-routes"
+
+const MESSAGE_SIZE = 250;
+
+const socket = io("http://localhost:3000", {
+  withCredentials: true,
+  autoConnect: false
+});
 
 function fmtTime(ts) {
   const d = new Date(ts);
@@ -17,6 +26,7 @@ function Chat() {
   const [isTyping, setIsTyping] = useState(false);
 
   const { authUser, logout } = useAuth();
+  const username = authUser.name;
   const navigate = useNavigate();
 
   const listRef = useRef(null);
@@ -24,11 +34,17 @@ function Chat() {
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
-  }, [messages.length]);
+
+    socket.connect();
+    socket.on("receive_message", (data) => {
+      console.alert(data);
+    });
+
+  }, [messages.length, socket]);
 
   const handleLogout = async () => {
     await logout();
-    navigate(FRONTEND_ROUTES.LOGIN, { replace: true });
+    navigate(LOGIN, { replace: true });
   };
 
   const handleChange = (e) => {
@@ -47,9 +63,13 @@ function Chat() {
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text) return;
-    const me = authUser?.username || "You";
+    if (!text || text.length() > MESSAGE_SIZE) return;
     const now = Date.now();
+    socket.emit("send_message", {
+      username: authUser.username,
+      timestamp: now,
+      message: text
+    });
     setMessages((prev) => [...prev, { id: "m_" + now, from: me, text, at: now }]);
     setInput("");
   };
@@ -131,11 +151,10 @@ function Chat() {
                 {messages.map((m) => (
                   <li key={m.id} className="max-w-[85%]">
                     <div
-                      className={`inline-block rounded-2xl px-4 py-2 ${
-                        (authUser?.username || "You") === m.from
-                          ? "bg-blue-600/90 text-white"
-                          : "bg-white/10 text-white"
-                      }`}
+                      className={`inline-block rounded-2xl px-4 py-2 ${(authUser?.username || "You") === m.from
+                        ? "bg-blue-600/90 text-white"
+                        : "bg-white/10 text-white"
+                        }`}
                     >
                       <div className="text-xs opacity-80 mb-0.5">
                         {m.from} • {fmtTime(m.at)}

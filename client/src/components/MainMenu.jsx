@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { useAuth } from "./AuthProvider";
+import { LOGIN } from "../shared/frontend-routes";
 
 function MainMenu() {
   const { authUser, logout } = useAuth();
@@ -10,6 +12,7 @@ function MainMenu() {
   const handleLogout = async (e) => {
     e.preventDefault();
     await logout();
+    navigate(LOGIN, { replace: true });
   };
 
   const handleChatClick = () => {
@@ -27,7 +30,7 @@ function MainMenu() {
 
   // NEW: dev-only shortcut straight to Chat (the lobby)
   const handleOpenChatDev = () => {
-    navigate("/chat?dev=1"); // <-- bypass auth via query
+    navigate("/chat"); // <-- bypass auth via query
   };
 
   return (

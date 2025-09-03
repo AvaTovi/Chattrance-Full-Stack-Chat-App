@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
-import { FRONTEND_ROUTES } from "../shared/endpoints";
+import { LOGIN } from "../shared/frontend-routes";
 import { useAuth } from "./AuthProvider";
 
 function Signup() {
@@ -21,7 +21,7 @@ function Signup() {
 
 	const handleLogout = async () => {
 		await logout();
-		navigate(FRONTEND_ROUTES.LOGIN, { replace: true });
+		navigate(LOGIN, { replace: true });
 	};
 
 	const handleChange = (e) => {

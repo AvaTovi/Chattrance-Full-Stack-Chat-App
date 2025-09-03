@@ -13,6 +13,7 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!username || !password) return;
     const res = await login(username, password, rememberPassword);
     setMessage(res.message);
     if (res.success) {

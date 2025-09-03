@@ -3,13 +3,16 @@ import { StatusCodes } from "http-status-codes";
 import {
   authenticateUser,
   createUser,
-  deleteResetToken,
-  findUserByEmail,
-  insertResetToken,
   isUserTaken,
-  updatePassword,
-  verifyResetToken
+  findUserByEmail,
+  updatePassword
 } from "../models/user.js";
+
+import {
+  insertResetToken,
+  deleteResetToken,
+  verifyResetToken
+} from "../models/reset-token.js";
 
 import {
   isValidEmail,
@@ -147,22 +150,6 @@ export async function logout(req, res) {
       .json(apiResponse());
 
   })
-
-}
-
-export async function getUser(req, res) {
-
-  const user = req.session.user;
-
-  if (!user) {
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json(apiResponse(false, "Not authenticated"));
-  }
-
-  return res
-    .status(StatusCodes.OK)
-    .json(apiResponse(true, null, { user }));
 
 }
 

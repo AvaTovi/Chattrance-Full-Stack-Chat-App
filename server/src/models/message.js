@@ -1,4 +1,4 @@
-import { dbConnection } from "../db.js";
+import { dbConnection } from "../config/db.js";
 
 /**
  * 

@@ -1,16 +1,14 @@
 import { SpinningCircles } from "react-loading-icons";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
+import { useEffect } from "react";
 
 const ProtectedRoutes = () => {
-  const { authUser, loading } = useAuth();
-  const location = useLocation();
+  const { authUser, loading, checkAuthentication } = useAuth();
 
-  // allow /anything?dev=1 (or env flag) during development
-  const params = new URLSearchParams(location.search);
-  const devBypass =
-    params.get("dev") === "1" ||
-    process.env.REACT_APP_DEV_LOBBY_BYPASS === "1";
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
 
   if (loading) {
     return (
@@ -31,7 +29,7 @@ const ProtectedRoutes = () => {
     );
   }
 
-  if (authUser || devBypass) return <Outlet />;
+  if (authUser) return <Outlet />;
 
   return <Navigate to="/login" replace />;
 };

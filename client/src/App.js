@@ -1,4 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+
 import { AuthProvider } from "./components/AuthProvider";
 import Chat from "./components/Chat";
 import ForgotPass from "./components/ForgotPass";

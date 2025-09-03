@@ -1,15 +1,8 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { API_ROUTES } from "../shared/endpoints";
+
+import { BASE, SIGNUP, LOGIN, LOGOUT, GET_USER, REQUEST_RESET, RESET_PASSWORD } from "../shared/api-routes";
 
 const AuthContext = React.createContext();
-
-const apiUrl = (route) => `/api${route}`;
-const USER = apiUrl(API_ROUTES.USER);
-const LOGIN = apiUrl(API_ROUTES.LOGIN);
-const LOGOUT = apiUrl(API_ROUTES.LOGOUT);
-const SIGNUP = apiUrl(API_ROUTES.SIGNUP);
-const REQUEST_RESET = apiUrl(API_ROUTES.REQUEST_RESET);
-const RESET_PASSWORD = apiUrl(API_ROUTES.RESET_PASSWORD);
 
 export function useAuth() {
   return useContext(AuthContext);
@@ -21,10 +14,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === "production") {
-      checkAuthentication();
-    } else {
-      setAuthUser({ id: "TEST", username: "TEST", email: "TEST" });
+    if (process.env.NODE_ENV === "development") {
+      setAuthUser({ id: -1, username: "TEST", email: "TEST" });
       setLoading(false);
     }
   }, []);
@@ -32,14 +23,13 @@ export function AuthProvider({ children }) {
 
   async function signup(username, password, email) {
     try {
-      const res = await fetch(SIGNUP, {
+      const res = await fetch(BASE + SIGNUP, {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, email }),
       });
       const data = await res.json();
-      return { success: res.ok, message: data.message };
+      return data;
     } catch (err) {
       console.error("Signup error:", err);
     }
@@ -47,17 +37,17 @@ export function AuthProvider({ children }) {
 
   async function login(username, password, rememberPassword) {
     try {
-      const res = await fetch(LOGIN, {
+      const res = await fetch(BASE + LOGIN, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, rememberPassword }),
       });
       const data = await res.json();
-      if (res.ok) {
-        setAuthUser(data.user);
+      if (data.ok) {
+        setAuthUser(data.data.user);
       }
-      return { success: res.ok, message: data.message };
+      return data;
     } catch (err) {
       console.error("Login error:", err);
     }
@@ -65,15 +55,15 @@ export function AuthProvider({ children }) {
 
   async function logout() {
     try {
-      const res = await fetch(LOGOUT, {
+      const res = await fetch(BASE + LOGOUT, {
         method: "POST",
         credentials: "include",
       });
       const data = await res.json();
-      if (res.ok) {
+      if (data.ok) {
         setAuthUser(null);
       }
-      return { success: res.ok, message: data.message };
+      return data;
     } catch (err) {
       console.error("Logout error:", err);
     }
@@ -81,12 +71,13 @@ export function AuthProvider({ children }) {
 
   async function checkAuthentication() {
     try {
-      const res = await fetch(USER, {
+      console.log(BASE + GET_USER);
+      const res = await fetch(BASE + GET_USER, {
         credentials: "include"
       });
-      if (res.ok) {
-        const userData = await res.json();
-        setAuthUser(userData.user);
+      const data = await res.json();
+      if (data.ok) {
+        setAuthUser(data.data.user);
       }
     } catch (err) {
       console.error("Check User error:", err);
@@ -97,13 +88,12 @@ export function AuthProvider({ children }) {
 
   async function requestReset(email) {
     try {
-      const res = await fetch(REQUEST_RESET, {
+      const res = await fetch(BASE + REQUEST_RESET, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
-      return { success: res.ok, message: data.message };
+      return await res.json();
     } catch (err) {
       console.error("Request reset error:", err);
     }
@@ -111,13 +101,12 @@ export function AuthProvider({ children }) {
 
   async function resetPassword(id, token, password) {
     try {
-      const res = await fetch(RESET_PASSWORD, {
-        method: "POST",
+      const res = await fetch(BASE + RESET_PASSWORD, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, token, password }),
       });
-      const data = await res.json();
-      return { success: res.ok, message: data.message };
+      return await res.json();
     } catch (err) {
       console.error("Password reset error:", err);
     }
@@ -130,6 +119,7 @@ export function AuthProvider({ children }) {
       signup,
       login,
       logout,
+      checkAuthentication,
       requestReset,
       resetPassword,
     }),

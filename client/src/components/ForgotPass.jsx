@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FRONTEND_ROUTES } from "../shared/endpoints";
+import { LOGIN } from "../shared/frontend-routes";
 import { useAuth } from "./AuthProvider";
 
 function ForgotPass() {
@@ -16,9 +16,10 @@ function ForgotPass() {
     setMessage(res.message);
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async (e) => {
+    e.preventDefault();
     await logout();
-    navigate(FRONTEND_ROUTES.LOGIN);
+    navigate(LOGIN, { replace: true });
   };
 
   return (
