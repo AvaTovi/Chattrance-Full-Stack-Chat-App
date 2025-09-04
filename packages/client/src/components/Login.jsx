@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+import NavBar from "./NavBar";
+
 import { useAuth } from "./AuthProvider";
+
+import { FRONTEND_ROUTES } from "chattrance-shared";
 
 function Login() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberPassword, setRememberPassword] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -15,58 +19,25 @@ function Login() {
     e.preventDefault();
     if (!username || !password) return;
     const res = await login(username, password, rememberPassword);
-    setMessage(res.message);
-    if (res.success) {
+
+    if (res.ok) {
+      setMessage("Login successful");
+
       setTimeout(() => {
-        setMessage("Redirecting...");
-      }, 1000);
-      setTimeout(() => {
-        navigate("/");
+
+        setMessage("Redirecting…");
+        navigate(FRONTEND_ROUTES.HOME);
+
       }, 1500);
     }
+
+    setMessage(res.error);
   };
 
   return (
     <div className="h-full flex flex-col bg-black">
       {/* Header */}
-      <header className="w-full px-6 py-4 flex items-center justify-between">
-        {/* Logo & Title */}
-        <div className="flex items-center">
-          <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
-          <h1
-            className="text-2xl text-white font-extrabold"
-            style={{ fontFamily: "Outfit" }}
-          >
-            Chattrance
-          </h1>
-        </div>
-
-        {/* Hamburger Menu */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex flex-col h-6 w-6 justify-between items-center group"
-          >
-            <div className="h-1 w-6 bg-white transition" />
-            <div className="h-1 w-6 bg-white transition" />
-            <div className="h-1 w-6 bg-white transition" />
-          </button>
-          {isOpen && (
-            <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
-              <li className="block px-4 py-2 hover:bg-gray-200">
-                <Link to="/signup">Sign Up</Link>
-              </li>
-              <li className="block px-4 py-2 hover:bg-gray-200">
-                <Link to="/settings">Settings</Link>
-              </li>
-              <li className="block px-4 py-2 hover:bg-gray-200">
-                <Link to="/">Back to Home</Link>
-              </li>
-            </ul>
-          )}
-        </div>
-      </header>
+      <NavBar />
 
       {/* Login screen */}
       <section className="h-full flex items-center justify-center font-mono bg-gradient-to-r from-red-500 from -10% via-indigo-500 via-50% to-orange-400 to-100%">

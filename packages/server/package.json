@@ -1,7 +1,7 @@
 {
-  "name": "server",
+  "name": "chattrance-express-app",
   "version": "1.0.0",
-  "description": "",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",

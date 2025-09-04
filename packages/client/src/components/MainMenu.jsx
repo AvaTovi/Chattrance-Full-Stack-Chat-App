@@ -1,19 +1,9 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { useAuth } from "./AuthProvider";
-import { LOGIN } from "../shared/frontend-routes";
+import NavBar from "./NavBar";
 
 function MainMenu() {
-  const { authUser, logout } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    await logout();
-    navigate(LOGIN, { replace: true });
-  };
 
   const handleChatClick = () => {
     // keep your current behavior for Start/Join
@@ -35,57 +25,9 @@ function MainMenu() {
 
   return (
     <div className="h-screen flex flex-col bg-black text-white">
-      {/* Header */}
-      <header className="w-full px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
-          <h1 className="text-2xl font-extrabold" style={{ fontFamily: "Outfit" }}>
-            Chattrance
-          </h1>
-        </div>
 
-        {/* Hamburger */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex flex-col h-6 w-6 justify-between items-center group"
-          >
-            <div className="h-1 w-6 bg-white transition" />
-            <div className="h-1 w-6 bg-white transition" />
-            <div className="h-1 w-6 bg-white transition" />
-          </button>
-
-          {isOpen && (
-            <ul className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col p-2 z-50">
-              {authUser ? (
-                <>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/account">Account Info</Link>
-                  </li>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/settings">Settings</Link>
-                  </li>
-                  <li className="block px-4 py-2 hover:bg-gray-200 text-red-600">
-                    <button type="button" onClick={handleLogout} className="w-full text-left">
-                      Sign Out
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/settings">Settings</Link>
-                  </li>
-                  <li className="block px-4 py-2 hover:bg-gray-200">
-                    <Link to="/login">Log In</Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          )}
-        </div>
-      </header>
+      {/* Header and Navigation Bar */}
+      <NavBar />
 
       {/* Main */}
       <div className="flex-grow flex items-center justify-center">

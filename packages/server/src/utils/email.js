@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import nodeMailer from "nodemailer";
-import { RESET_PASSWORD_PAGE } from "../shared/frontend-routes.js";
+
+import { FRONTEND_ROUTES } from "chattrance-shared";
 
 dotenv.config();
 
@@ -81,10 +82,7 @@ function mailTemplate(content, buttonURL, buttonText) {
  */
 export async function sendPasswordResetEmail(id, email, plainToken) {
 
-  const baseLink =
-    process.env.APP_ENV === "development" ?
-      `${process.env.FRONTEND_URL}:${process.env.APP_PORT}` + RESET_PASSWORD_PAGE :
-      process.env.FRONTEND_URL + RESET_PASSWORD_PAGE;
+  const baseLink = process.env.FRONTEND_URL + FRONTEND_ROUTES.AUTH.RESET_PASSWORD;
 
   const body = mailTemplate(
     "We have received a request to reset your password. Please reset your password using the link below.",

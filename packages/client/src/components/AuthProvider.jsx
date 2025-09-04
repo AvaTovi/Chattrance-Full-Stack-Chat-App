@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 
-import { BASE, SIGNUP, LOGIN, LOGOUT, GET_USER, REQUEST_RESET, RESET_PASSWORD } from "../shared/api-routes";
+import { API_ROUTES } from "chattrance-shared";
 
 const AuthContext = React.createContext();
 
@@ -20,10 +20,9 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-
   async function signup(username, password, email) {
     try {
-      const res = await fetch(BASE + SIGNUP, {
+      const res = await fetch(API_ROUTES.AUTH.SIGNUP, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, email }),
@@ -37,7 +36,7 @@ export function AuthProvider({ children }) {
 
   async function login(username, password, rememberPassword) {
     try {
-      const res = await fetch(BASE + LOGIN, {
+      const res = await fetch(API_ROUTES.AUTH.LOGIN, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -55,7 +54,7 @@ export function AuthProvider({ children }) {
 
   async function logout() {
     try {
-      const res = await fetch(BASE + LOGOUT, {
+      const res = await fetch(API_ROUTES.AUTH.LOGOUT, {
         method: "POST",
         credentials: "include",
       });
@@ -71,8 +70,7 @@ export function AuthProvider({ children }) {
 
   async function checkAuthentication() {
     try {
-      console.log(BASE + GET_USER);
-      const res = await fetch(BASE + GET_USER, {
+      const res = await fetch(API_ROUTES.USER.GET_USER, {
         credentials: "include"
       });
       const data = await res.json();
@@ -88,7 +86,7 @@ export function AuthProvider({ children }) {
 
   async function requestReset(email) {
     try {
-      const res = await fetch(BASE + REQUEST_RESET, {
+      const res = await fetch(API_ROUTES.AUTH.REQUEST_RESET_PASSWORD, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -101,7 +99,7 @@ export function AuthProvider({ children }) {
 
   async function resetPassword(id, token, password) {
     try {
-      const res = await fetch(BASE + RESET_PASSWORD, {
+      const res = await fetch(API_ROUTES.AUTH.RESET_PASSWORD, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, token, password }),
@@ -121,7 +119,7 @@ export function AuthProvider({ children }) {
       logout,
       checkAuthentication,
       requestReset,
-      resetPassword,
+      resetPassword
     }),
     [authUser, loading]
   );

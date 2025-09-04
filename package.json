@@ -1,0 +1,9 @@
+{
+  "name": "chattrance-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/client",
+    "packages/server",
+    "packages/shared"
+  ]
+}

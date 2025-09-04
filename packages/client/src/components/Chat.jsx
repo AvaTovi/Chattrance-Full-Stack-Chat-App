@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 
+import NavBar from "./NavBar";
 import { useAuth } from "./AuthProvider";
-
-import { LOGIN } from "../shared/frontend-routes"
 
 const MESSAGE_SIZE = 250;
 
@@ -19,7 +17,6 @@ function fmtTime(ts) {
 }
 
 function Chat() {
-  const [isOpen, setIsOpen] = useState(false);
   const [participants, setParticipants] = useState([]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -27,7 +24,6 @@ function Chat() {
 
   const { authUser, logout } = useAuth();
   const username = authUser.name;
-  const navigate = useNavigate();
 
   const listRef = useRef(null);
   const typingTimer = useRef(null);
@@ -41,11 +37,6 @@ function Chat() {
     });
 
   }, [messages.length, socket]);
-
-  const handleLogout = async () => {
-    await logout();
-    navigate(LOGIN, { replace: true });
-  };
 
   const handleChange = (e) => {
     setInput(e.target.value);
@@ -76,48 +67,9 @@ function Chat() {
 
   return (
     <div className="h-screen bg-black text-white flex flex-col">
-      <header className="w-full px-6 py-4 flex items-center justify-between border-b border-white/10">
-        <div className="flex items-center">
-          <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-extrabold" style={{ fontFamily: "Outfit" }}>
-              Chattrance
-            </h1>
-            <span className="text-sm text-white/70">Chat Lobby</span>
-          </div>
-        </div>
 
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsOpen((v) => !v)}
-            className="flex flex-col h-6 w-6 justify-between items-center"
-            aria-label="menu"
-          >
-            <div className="h-1 w-6 bg-white" />
-            <div className="h-1 w-6 bg-white" />
-            <div className="h-1 w-6 bg-white" />
-          </button>
-          {isOpen && (
-            <ul className="absolute right-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg flex flex-col p-2 z-50">
-              <li className="px-4 py-2 text-sm text-gray-700 border-b">
-                Signed in as <strong>{authUser?.username || "Guest"}</strong>
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100">
-                <Link to="/settings">Settings</Link>
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100">
-                <Link to="/account">Account Info</Link>
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100 text-red-600">
-                <button type="button" onClick={handleLogout} className="w-full text-left">
-                  Sign Out
-                </button>
-              </li>
-            </ul>
-          )}
-        </div>
-      </header>
+      {/* Header and Navigation Bar */}
+      <NavBar />
 
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden md:flex md:w-64 flex-col border-r border-white/10">

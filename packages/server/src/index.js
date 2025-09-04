@@ -2,14 +2,14 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import http from "http";
-import path from "path";
 import session from "express-session";
 import { Server } from "socket.io";
+
+import { BASE_API } from "chattrance-shared";
 
 import { sessionStore } from "./config/db.js";
 import authRouter from "./routes/auth.js";
 import userRouter from "./routes/user.js"
-import { BASE } from "./shared/api-routes.js";
 
 import { insertMessage, getConversation, getAllConversations, createConversation } from "./models/message.js"
 
@@ -33,8 +33,8 @@ app.use(
 	}),
 );
 
-app.use(BASE, authRouter);
-app.use(BASE, userRouter);
+app.use(BASE_API, authRouter);
+app.use(BASE_API, userRouter);
 
 const server = http.createServer(app);
 const io = new Server(server);
