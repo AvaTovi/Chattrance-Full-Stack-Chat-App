@@ -4,7 +4,7 @@ import io from "socket.io-client";
 import NavBar from "./NavBar";
 import { useAuth } from "./AuthProvider";
 
-const MESSAGE_SIZE = 250;
+const MESSAGE_SIZE = 500;
 
 const socket = io("http://localhost:3000", {
   withCredentials: true,

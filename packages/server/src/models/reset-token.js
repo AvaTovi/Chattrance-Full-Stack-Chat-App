@@ -71,6 +71,6 @@ export async function deleteResetToken(user_id) {
 export async function verifyResetToken(user_id, plain_token) {
   const record = await getPasswordResetToken(user_id);
   if (!record) { return false };
-  const checkToken = crypto.createHash("sha256").update(plain_token).digest("hex");
+  const checkToken = crypto.createHash("sha256").update(plain_token).digest("binary");
   return checkToken === record.token;
 }
