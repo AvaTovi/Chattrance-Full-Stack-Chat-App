@@ -5,8 +5,6 @@ import http from "http";
 import session from "express-session";
 import { Server } from "socket.io";
 
-import { BASE_API } from "chattrance-shared";
-
 import { sessionStore } from "./config/db.js";
 import authRouter from "./routes/auth.js";
 import userRouter from "./routes/user.js"
@@ -33,8 +31,8 @@ app.use(
 	}),
 );
 
-app.use(BASE_API, authRouter);
-app.use(BASE_API, userRouter);
+app.use(authRouter);
+app.use(userRouter);
 
 const server = http.createServer(app);
 const io = new Server(server);

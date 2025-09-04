@@ -54,7 +54,7 @@ function Chat() {
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text || text.length() > MESSAGE_SIZE) return;
+    if (!text || text.length > MESSAGE_SIZE) return;
     const now = Date.now();
     socket.emit("send_message", {
       username: authUser.username,

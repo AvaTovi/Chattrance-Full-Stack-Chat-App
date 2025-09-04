@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
+import { FRONTEND_ROUTES } from "chattrance-shared";
+
 import NavBar from "./NavBar";
 
 function MainMenu() {
@@ -7,20 +9,20 @@ function MainMenu() {
 
   const handleChatClick = () => {
     // keep your current behavior for Start/Join
-    navigate("/login");
+    navigate(FRONTEND_ROUTES.CHAT);
   };
 
   const handleStartQueueClick = () => {
-    navigate("/startQueue");
+    navigate(FRONTEND_ROUTES.QUEUE.START);
   };
 
   const handleJoinQueueClick = () => {
-    navigate("/joinQueue");
+    navigate(FRONTEND_ROUTES.QUEUE.JOIN);
   };
 
-  // NEW: dev-only shortcut straight to Chat (the lobby)
+  // Ava this was pointless the AuthProvider makes you logged in already
   const handleOpenChatDev = () => {
-    navigate("/chat"); // <-- bypass auth via query
+    navigate(FRONTEND_ROUTES.CHAT); // <-- bypass auth via query
   };
 
   return (

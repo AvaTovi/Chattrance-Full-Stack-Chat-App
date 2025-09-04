@@ -24,7 +24,7 @@ function NavBar() {
   return (
     <header className="w-full px-6 py-4 flex items-center justify-between">
       <div className="flex items-center">
-        <img src="/CTlogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
+        <img src="/CTLogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
         <h1 className="text-2xl font-extrabold" style={{ fontFamily: "Outfit" }}>
           Chattrance
         </h1>
