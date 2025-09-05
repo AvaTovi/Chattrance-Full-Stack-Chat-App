@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 
+import { API_ROUTES } from "chattrance-shared";
+
 import NavBar from "./NavBar";
 import { useAuth } from "./AuthProvider";
+
 
 const MESSAGE_SIZE = 500;
 
@@ -22,8 +25,8 @@ function Chat() {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  const { authUser, logout } = useAuth();
-  const username = authUser.name;
+  const { authUser } = useAuth();
+  const me = authUser.name || "You";
 
   const listRef = useRef(null);
   const typingTimer = useRef(null);
@@ -37,6 +40,12 @@ function Chat() {
     });
 
   }, [messages.length, socket]);
+
+  const getRooms = () => {
+
+
+
+  }
 
   const handleChange = (e) => {
     setInput(e.target.value);

@@ -2,6 +2,7 @@ import validator from "validator";
 
 import {
 	ALLOWED_EMAIL_DOMAINS,
+	MAX_MESSAGE_SIZE,
 	MAX_PASSWORD_LENGTH,
 	MAX_USERNAME_LENGTH,
 	MIN_PASSWORD_LENGTH,
@@ -26,29 +27,27 @@ export function validateSignup(email, username, password) {
 	if (!VALID_CHARACTERS.test(username) || !VALID_CHARACTERS.test(password))
 		return "Username and password must be alphanumeric and may include !, @, $, _, and - characters";
 
-	const validEmail = isValidEmail(email);
+	const error = isValidEmail(email);
 
-	if (validEmail) {
-		return validEmail;
+	if (error) {
+		return error;
 	}
 
 	if (username.length > MAX_USERNAME_LENGTH)
 		return `Username must be <= ${MAX_USERNAME_LENGTH} characters`;
 
-	if (password.length > MAX_PASSWORD_LENGTH)
-		return `Password must be <= ${MAX_PASSWORD_LENGTH} characters`;
-
-	if (password.length < MIN_PASSWORD_LENGTH)
-		return `Password must be >= ${MIN_PASSWORD_LENGTH} characters`;
+	if (password.length < MIN_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH)
+		return `Password must be >= ${MIN_PASSWORD_LENGTH} & <= ${MAX_PASSWORD_LENGTH} characters`;
 
 	return null;
+
 }
 
 /**
  * 
  * @param {string} username 
  * @param {string} password 
- * @param {boolean} rememberPassword 
+ * @param {boolean | undefined} rememberPassword 
  * @returns {string?}
  */
 export function validateLogin(username, password, rememberPassword) {
@@ -65,11 +64,8 @@ export function validateLogin(username, password, rememberPassword) {
 	if (username.length > MAX_USERNAME_LENGTH)
 		return `Username must be <= ${MAX_USERNAME_LENGTH} characters`;
 
-	if (password.length > MAX_PASSWORD_LENGTH)
-		return `Password must be <= ${MAX_PASSWORD_LENGTH} characters`;
-
-	if (password.length < MIN_PASSWORD_LENGTH)
-		return `Password must be >= ${MIN_PASSWORD_LENGTH} characters`;
+	if (password.length < MIN_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH)
+		return `Password must be >= ${MIN_PASSWORD_LENGTH} & <= ${MAX_PASSWORD_LENGTH} characters`;
 
 	return null;
 }
@@ -120,10 +116,42 @@ export function isValidPassword(password) {
 /**
  * 
  * @param {string} message 
+ * @returns {string?}
+ */
+export function isValidMessage(message) {
+	if (typeof message !== "string") {
+		return "Invalid type";
+	}
+
+	if (message.length === 0) {
+		return "Empty messages not allowed";
+	}
+
+	if (message.length > MAX_MESSAGE_SIZE) {
+		return `Message must be <= ${MAX_MESSAGE_SIZE} characters`;
+	}
+
+	return null;
+
+}
+
+/**
+ * 
+ * @param {string} message 
  * @returns {string}
  */
 export function sanitizeMessage(message) {
-	if (typeof message !== "string") return;
-	message = message.trim();
 	return validator.escape(message);
+}
+
+export function isValidRoomID(id) {
+	if (typeof id !== "string" || typeof id !== "number") {
+		return "Invaild type";
+	}
+
+	if (typeof id === "number" && id < 0) {
+		return "Room id must be unsigned"
+	}
+
+
 }

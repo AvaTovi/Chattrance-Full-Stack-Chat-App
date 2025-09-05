@@ -3,7 +3,7 @@ import expressMySQLSession from "express-mysql-session";
 import session from "express-session";
 import mysql from "mysql2";
 
-import { SESSION_CLEANUP, SESSION_LIFETIME } from "../utils/constants.js";
+import { SESSION_CLEANUP, SESSION_LIFETIME } from "../user/constants.js";
 
 dotenv.config();
 

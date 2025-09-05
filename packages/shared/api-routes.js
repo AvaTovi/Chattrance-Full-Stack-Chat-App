@@ -14,5 +14,8 @@ export const API_ROUTES = {
   USER: {
     GET_USER: `${BASE_API}/user`,
     CHANGE_PASSWORD: `${BASE_API}/change-password`
+  },
+  CHAT: {
+    GET_ROOMS: `${BASE_API}/rooms`
   }
 }

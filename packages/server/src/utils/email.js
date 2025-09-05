@@ -78,7 +78,6 @@ function mailTemplate(content, buttonURL, buttonText) {
  * @param {number} id
  * @param {string} email 
  * @param {string} plainToken
- * @returns {}
  */
 export async function sendPasswordResetEmail(id, email, plainToken) {
 

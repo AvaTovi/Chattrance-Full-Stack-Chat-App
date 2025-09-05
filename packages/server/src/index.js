@@ -3,13 +3,12 @@ import dotenv from "dotenv";
 import express from "express";
 import http from "http";
 import session from "express-session";
-import { Server } from "socket.io";
 
 import { sessionStore } from "./config/db.js";
-import authRouter from "./routes/auth.js";
-import userRouter from "./routes/user.js"
+import { setupSocket } from "./sockets/socket.js";
 
-import { insertMessage, getConversation, getAllConversations, createConversation } from "./models/message.js"
+import authRouter from "./auth/auth-route.js";
+import userRouter from "./user/user-route.js"
 
 dotenv.config();
 
@@ -35,16 +34,8 @@ app.use(authRouter);
 app.use(userRouter);
 
 const server = http.createServer(app);
-const io = new Server(server);
 
-io.on("connection", (socket) => {
-	console.log(`User connected: ${socket.id}`);
-
-	socket.on("send_message", (data) => {
-		socket.broadcast.emit("receive_message", data)
-		console.log(data);
-	});
-});
+setupSocket(server);
 
 server.listen(process.env.PORT, () =>
 	console.log(`Server running on ${process.env.BACKEND_URL}:${process.env.PORT}`),
