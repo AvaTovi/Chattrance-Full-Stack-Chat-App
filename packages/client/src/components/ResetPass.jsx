@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import NavBar from "./NavBar";
 import { useAuth } from "./AuthProvider";
 
+import { FRONTEND_ROUTES } from "chattrance-shared";
+
 function ResetPass() {
 	const [form, setForm] = useState({
 		password: "",
@@ -38,7 +40,7 @@ function ResetPass() {
 
 	useEffect(() => {
 		if (!id || !token) {
-			navigate(FRONTEND_ROUTES.RQUEST_RESET, { replace: true });
+			navigate(FRONTEND_ROUTES.AUTH.LOGIN, { replace: true });
 		}
 	}, [id, token]);
 

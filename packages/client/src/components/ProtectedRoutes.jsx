@@ -6,10 +6,6 @@ import { useEffect } from "react";
 const ProtectedRoutes = () => {
   const { authUser, loading, checkAuthentication } = useAuth();
 
-  useEffect(() => {
-    checkAuthentication();
-  }, []);
-
   if (loading) {
     return (
       <div className="h-screen flex flex-col bg-black">

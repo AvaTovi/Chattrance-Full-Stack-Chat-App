@@ -15,7 +15,10 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (process.env.NODE_ENV === "development") {
-      setAuthUser({ id: -1, username: "TEST", email: "TEST" });
+      checkAuthentication();
+      if (!authUser) {
+        setAuthUser({ id: -1, username: "TEST", email: "TEST" });
+      }
       setLoading(false);
     }
   }, []);
@@ -34,13 +37,13 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function login(username, password, rememberPassword) {
+  async function login(username, password, rememberMe) {
     try {
       const res = await fetch(API_ROUTES.AUTH.LOGIN, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, rememberPassword }),
+        body: JSON.stringify({ username, password, rememberMe }),
       });
       const data = await res.json();
       if (data.ok) {
@@ -59,12 +62,11 @@ export function AuthProvider({ children }) {
         credentials: "include",
       });
       const data = await res.json();
-      if (data.ok) {
-        setAuthUser(null);
-      }
       return data;
     } catch (err) {
       console.error("Logout error:", err);
+    } finally {
+      setAuthUser(null);
     }
   }
 

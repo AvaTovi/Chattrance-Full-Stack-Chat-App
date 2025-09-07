@@ -79,13 +79,13 @@ function mailTemplate(content, buttonURL, buttonText) {
  * @param {string} email 
  * @param {string} plainToken
  */
-export async function sendPasswordResetEmail(id, email, plainToken) {
+export async function sendPasswordResetEmail(email, plainToken) {
 
   const baseLink = process.env.FRONTEND_URL + FRONTEND_ROUTES.AUTH.RESET_PASSWORD;
 
   const body = mailTemplate(
     "We have received a request to reset your password. Please reset your password using the link below.",
-    `${baseLink}?id=${id}&token=${plainToken}`,
+    `${baseLink}?token=${plainToken}`,
     "Reset Password"
   );
 

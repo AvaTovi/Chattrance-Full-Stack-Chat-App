@@ -26,6 +26,8 @@ function Chat() {
   const [isTyping, setIsTyping] = useState(false);
 
   const { authUser } = useAuth();
+
+  console.log(authUser);
   const me = authUser.name || "You";
 
   const listRef = useRef(null);

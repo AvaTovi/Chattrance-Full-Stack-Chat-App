@@ -2,57 +2,49 @@ import { dbConnection } from "../config/db.js";
 
 /**
  * 
- * @param {string} user_id 
- * @returns {Promise<{ token: string, user_id: number, created: Date, expires: Date }?>}
+ * @param {string} userId 
+ * @returns {Promise<Array<{ id: number, token: Buffer, user_id: number, created: Date, expires: Date }>?>}
  */
-export async function get(user_id) {
+export async function get(userId) {
   const [rows] = await dbConnection
     .promise()
     .query(
-      "SELECT * WHERE user_id = ?",
-      [user_id],
+      "SELECT id, token, user_id, expires FROM reset_tokens WHERE user_id = ?",
+      [userId],
     );
-  return rows[0] || null;
+  return rows.length > 0 ? rows : null;
 }
 
 /**
  * 
- * @param {string} token
- * @param {number} user_id
- * @param {Date} created
+ * @param {Buffer} token
+ * @param {number} userId
  * @param {Date} expires
  * @returns {Promise<boolean>}
  */
-export async function create(token, user_id, created, expires) {
-
+export async function create(token, userId, expires) {
   const [result] = await dbConnection
     .promise()
     .query(
-      `
-      INSERT INTO reset_tokens (token, user_id, created, expires) VALUES (?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE
-      token = VALUES(token),
-      created = VALUES(created),
-      expires = VALUES(expires)
-      `,
-      [token, user_id, created, expires],
+      "INSERT (token, user_id, expires) INTO reset_tokens VALUES (?, ?, ?)",
+      [token, userId, expires],
     );
 
-  return result.affectedRows > 0;
+  return result.affectedRows === 1;
 }
 
 /**
  * 
- * @param {number} user_id 
+ * @param {number} userId 
  * @returns {Promise<boolean>}
  */
-export async function deleteToken(user_id) {
+export async function deleteToken(userId) {
 
   const [result] = await dbConnection
     .promise()
     .query(
       "DELETE FROM reset_tokens WHERE user_id = ?",
-      [user_id]
+      [userId]
     );
 
   return result.affectedRows > 0;

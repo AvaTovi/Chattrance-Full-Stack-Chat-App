@@ -21,6 +21,6 @@ export const dbConnection = mysql.createPool({
 export const sessionStore = new MySQLStore({
 	clearExpired: true,
 	checkExpirationInterval: SESSION_CLEANUP,
-	expiration: SESSION_LIFETIME,
-	createDatabaseTable: true
+	createDatabaseTable: true,
+	maxAge: SESSION_LIFETIME
 }, dbConnection.promise());

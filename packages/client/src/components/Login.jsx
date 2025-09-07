@@ -11,14 +11,14 @@ function Login() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberPassword, setRememberPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!username || !password) return;
-    const res = await login(username, password, rememberPassword);
+    const res = await login(username, password, rememberMe);
 
     if (res.ok) {
       setMessage("Login successful");
@@ -64,16 +64,16 @@ function Login() {
                 className="rounded-md p-1 border-2 outline-none focus:border-blue-400 focus:bg-slate-500"
               />
             </div>
-            {/* Remember password button */}
+            {/* Remember Me button */}
             <div className="flex gap-1 items-center">
               <input
                 type="checkbox"
-                checked={rememberPassword}
+                checked={rememberMe}
                 onChange={(e) => {
-                  setRememberPassword(e.target.checked);
+                  setRememberMe(e.target.checked);
                 }}
               />
-              <span className="text-base">Remember Password</span>
+              <span className="text-base">Remember Me</span>
             </div>
 
             {message && <p className="text-red-600 font-semibold">{message}</p>}

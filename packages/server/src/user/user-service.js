@@ -1,24 +1,32 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-import { SALT_ROUNDS, TOKEN_LIFETIME, TOKEN_SIZE } from "./constants.js";
+import { ACTIVE_TOKENS, SALT_ROUNDS, TOKEN_LIFETIME, TOKEN_SIZE } from "./constants.js";
 
 import * as userModel from "./user-model.js";
-
 import * as resetTokenModel from "./reset-token-model.js";
 
+import { ERROR_CODES } from "./error-codes.js";
+
+/**
+ * 
+ * @param {string} email 
+ * @param {string} name 
+ * @param {string} password
+ * @returns { Promise<{ ok : boolean, message: string | undefined }> }
+ */
 export async function createUser(email, name, password) {
 
-  const userEmail = await userModel.getByEmail(email);
+  const userByEmail = await userModel.getByEmail(email);
 
-  if (userEmail) {
-    return { ok: false, message: "Email already taken" };
+  if (userByEmail) {
+    return { ok: false, message: ERROR_CODES.EMAIL_TAKEN };
   }
 
-  const userName = await userModel.getByName(name);
+  const userByName = await userModel.getByName(name);
 
-  if (userName) {
-    return { ok: false, message: "Username already taken" };
+  if (userByName) {
+    return { ok: false, message: ERROR_CODES.USERNAME_TAKEN };
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -26,93 +34,128 @@ export async function createUser(email, name, password) {
   const success = await userModel.create(email, name, passwordHash);
 
   if (!success) {
-    return { ok: false, message: "Failed to create user" };
+    return { ok: false, message: ERROR_CODES.CREATE_USER_FAILED };
   }
 
-  return { ok: true, message: "" };
+  return { ok: true };
 
 }
 
+/**
+ * 
+ * @param {string} name 
+ * @param {string} password 
+ * @returns { Promise<{ ok: boolean, message: string | undefined, data: { user: { id: number, email: string, name: string, created: Date } } | undefined }> }
+ */
 export async function authenticateUser(name, password) {
 
-  const user = await userModel.getByName(name);
+  const userData = await userModel.getByName(name);
 
-  if (!user) {
-    return { ok: false, message: "User does not exist" };
+  if (!userData) {
+    return { ok: false, message: ERROR_CODES.USER_NOT_FOUND };
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const { password: passwordHash, ...user } = userData;
 
-  if (!isMatch) {
-    return { ok: false, message: "Incorrect credentials" };
+  if (!await bcrypt.compare(password, passwordHash)) {
+    return { ok: false, message: ERROR_CODES.INCORRECT_PASSWORD };
   }
 
-  return { ok: true, message: "", data: { user } };
+  return { ok: true, data: { user } };
 
 }
 
+/**
+ * 
+ * @param {number} id
+ * @param {string} password
+ * @returns { Promise<{ ok: boolean, message: string | undefined }> }
+ */
 export async function updatePassword(id, password) {
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
-  const success = userModel.updatePassword(id, passwordHash);
+  const success = await userModel.updatePassword(id, passwordHash);
 
-  if (!success) {
-    return { ok: false, message: "Failed to update password" };
-  }
-
-  return { ok: true, message: "" };
-
+  return success ?
+    { ok: true } :
+    { ok: false, message: ERROR_CODES.UPDATE_PASSWORD_FAILED };
 }
 
+/**
+ * 
+ * @param {number} userId 
+ * @returns { Promise<{ ok: boolean, message: string | undefined, data: { plainToken: string } | undefined }> }
+ */
 export async function createResetToken(userId) {
 
   const user = await userModel.getById(userId);
 
   if (!user) {
-    return { ok: false, message: "User does not exist" };
+    return { ok: false, message: ERROR_CODES.USER_NOT_FOUND };
   }
 
-  const resetToken = resetTokenModel.get(userId);
+  const resetTokens = await resetTokenModel.get(userId);
 
-  if (resetToken) {
-    return { ok: false, message: "Token already created" };
+  if (resetTokens) {
+    const currentTime = new Date();
+
+    const validTokens = resetTokens.filter(entry => currentTime < entry.expires);
+
+    if (validTokens.length >= ACTIVE_TOKENS) {
+      return { ok: false, message: ERROR_CODES.TOKENS_ALREADY_EXIST }
+    }
   }
 
   const plainToken = crypto.randomBytes(TOKEN_SIZE).toString("hex");
-  const tokenHash = crypto.createHash("sha256").update(plainToken).digest("binary");
+  const tokenHash = crypto.createHash("sha256").update(plainToken).digest();
+
   const created = new Date();
   const expires = new Date(Date.now() + TOKEN_LIFETIME);
 
-  const success = resetTokenModel.create(tokenHash, userId, created, expires);
+  const success = await resetTokenModel.create(tokenHash, userId, created, expires);
 
   if (!success) {
-    return { ok: false, message: "Failed to create token" };
+    return { ok: false, message: ERROR_CODES.TOKEN_CREATION_FAILED };
   }
 
-  return { ok: true, message: "", data: { id: user.id, plainToken } };
+  return { ok: true, data: { plainToken } };
 
 }
 
+/**
+ * 
+ * @param {number} userId 
+ * @param {string} plainToken 
+ * @returns { Promise<{ ok: boolean, message: string | undefined} }
+ */
 export async function verifyResetToken(userId, plainToken) {
 
-  const resetToken = await resetTokenModel.get(userId);
+  const resetTokens = await resetTokenModel.get(userId);
 
-  if (!resetToken) {
-    return { ok: false, message: "Token doesn't exist" };
+  if (!resetTokens) {
+    return { ok: false, message: ERROR_CODES.NO_TOKENS_FOUND };
   }
 
   const currentTime = new Date();
 
-  if (resetToken.expires > currentTime) {
-    return { ok: false, message: "Token expired" };
+  const validTokens = resetTokens.filter(entry => currentTime < entry.expires);
+
+  if (validTokens.length === 0) {
+    return { ok: false, message: ERROR_CODES.NO_TOKENS_FOUND };
   }
 
-  const tokenHash = crypto.createHash("sha256").update(plainToken).digest("binary");
+  const tokenHash = crypto.createHash("sha256").update(plainToken).digest();
 
-  if (tokenHash !== resetToken.token) {
-    return { ok: true, message: "Invalid token" };
+  const oneMatch = validTokens.find(entry => Buffer.compare(entry.token, tokenHash) === 0);
+
+  if (!oneMatch) {
+    return { ok: false, message: ERROR_CODES.INVALID_TOKEN };
   }
 
-  return { ok: true, message: "" };
+  if (!await resetTokenModel.deleteToken(userId)) {
+    return { ok: false, message: ERROR_CODES.DELETE_TOKEN_FAILED };
+  }
+
+  return { ok: true };
 }

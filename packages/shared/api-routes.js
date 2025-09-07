@@ -16,6 +16,7 @@ export const API_ROUTES = {
     CHANGE_PASSWORD: `${BASE_API}/change-password`
   },
   CHAT: {
-    GET_ROOMS: `${BASE_API}/rooms`
+    GET_ROOMS: `${BASE_API}/rooms`,
+    DELETE_ROOMS: `${BASE_API}/delete-room`
   }
 }
