@@ -3,19 +3,22 @@ import { dbConnection } from "../config/db.js";
 /**
  * 
  * @param {number} userId 
- * @returns {Promise<Array<{ id: number, name: string?, password: string?, owner: number, created: Date }>?>}
+ * @returns {Promise<Array<{ id: number, name: string?, password: string?, owner: number, created: Date, members: string }>?>}
  */
 export async function getRoomsByUserId(userId) {
   const [rows] = await dbConnection
     .promise()
     .query(`
-      SELECT r.id, r.name, r.password, r.owner, r.created
+      SELECT r.id, r.name, r.password, r.owner, r.created, GROUP_CONCAT(rm.user_id ORDER BY rm.user_id) AS members
       FROM rooms r
       INNER JOIN room_members rm ON r.id = rm.room_id
-      WHERE rm.user_id = ?
+      WHERE rm.user_id != r.owner
+      AND rm.user_id = ?
+      GROUP BY r.id, r.name, r.password, r.owner, r.created
       `,
       [userId]
     );
+
   return rows.length > 0 ? rows : null;
 }
 

@@ -4,7 +4,7 @@ import { useAuth } from "./AuthProvider";
 import { useEffect } from "react";
 
 const ProtectedRoutes = () => {
-  const { authUser, loading, checkAuthentication } = useAuth();
+  const { authUser, loading } = useAuth();
 
   if (loading) {
     return (

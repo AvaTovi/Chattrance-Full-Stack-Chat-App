@@ -1,9 +1,5 @@
 import { Server } from "socket.io";
 
-/**
- * 
- * @param {http.Server<typeof IncomingMessage, typeof ServerResponse>} server
- */
 export function setupSocket(server) {
 
   const io = new Server(server);

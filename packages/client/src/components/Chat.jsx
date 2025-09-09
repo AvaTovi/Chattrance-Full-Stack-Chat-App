@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { IoPerson } from "react-icons/io5";
 import io from "socket.io-client";
+
+import NavBar from "./NavBar";
 
 import { API_ROUTES } from "chattrance-shared";
 
-import NavBar from "./NavBar";
 import { useAuth } from "./AuthProvider";
 
 
@@ -20,7 +22,18 @@ function fmtTime(ts) {
 }
 
 function Chat() {
-  const [participants, setParticipants] = useState([]);
+
+  /**
+   * rooms: {
+   *   id: Number,
+   *   name: string | null,
+   *   owner: Number,
+   *   created: Date,
+   *   members: Array<Number>
+   * }
+   */
+  const r = { id: 0, name: "Hello", owner: 5, created: new Date(), members: [2, 3, 4, 9, 1102] };
+  const [chatRooms, setChatRooms] = useState([r]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -82,20 +95,30 @@ function Chat() {
       {/* Header and Navigation Bar */}
       <NavBar />
 
+      {/* Lists all chat rooms you are active in */}
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden md:flex md:w-64 flex-col border-r border-white/10">
           <div className="px-4 py-3 border-b border-white/10">
-            <h2 className="text-lg font-semibold">Participants</h2>
+            <h2 className="text-lg font-semibold">Chat Rooms</h2>
           </div>
           <ul className="flex-1 overflow-auto">
-            {participants.length === 0 ? (
-              <li className="px-4 py-3 text-white/60">No participants yet</li>
+            {chatRooms.length === 0 ? (
+              <li className="px-4 py-3 text-white/60">No chat rooms yet</li>
             ) : (
-              participants.map((p) => (
-                <li key={p.id} className="px-4 py-3 hover:bg-white/5">
+              chatRooms.map((room) => (
+                <li key={r.id} className="px-4 py-3 hover:bg-white/5">
                   <div className="flex items-center gap-3">
                     <div className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                    <span>{p.name}</span>
+                    {r.name ? (
+                      <div className="flex flex-col items-center">
+                        <span>{r.name}</span>
+                        <IoPerson size={24} />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <IoPerson size={24} />
+                      </div>
+                    )}
                   </div>
                 </li>
               ))

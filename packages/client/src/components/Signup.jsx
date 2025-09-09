@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import NavBar from "./NavBar";
 
 import { useAuth } from "./AuthProvider";
+
+import { FRONTEND_ROUTES } from "chattrance-shared";
 
 function Signup() {
 	const [form, setForm] = useState({
@@ -14,10 +17,14 @@ function Signup() {
 		email: ""
 	});
 
-	const [showPassword, setShowPassword] = useState(false);
-	const { signup } = useAuth();
-	const navigate = useNavigate();
 	const [message, setMessage] = useState("");
+
+	const [showPassword, setShowPassword] = useState(false);
+
+	const { signup } = useAuth();
+
+	const navigate = useNavigate();
+
 	const passwordsMatch = form.password === form.passwordCheck;
 
 	const handleChange = (e) => {
@@ -26,15 +33,20 @@ function Signup() {
 
 	const handleSignup = async (e) => {
 		e.preventDefault();
-		const res = await signup(form.username, form.password, form.email);
-		setMessage(res.message);
-		if (res.success) {
+		const res = await signup(form.email, form.username, form.password);
+
+		if (res.ok) {
+			setTimeout(() => {
+				setMessage("Signup successful");
+			}, 2000);
 			setTimeout(() => {
 				setMessage("Redirecting...");
 			}, 1000);
 			setTimeout(() => {
-				navigate(FRONTEND_ROUTES.LOGIN);
+				navigate(FRONTEND_ROUTES.AUTH.LOGIN);
 			}, 1000);
+		} else {
+			setMessage(res.error);
 		}
 	};
 

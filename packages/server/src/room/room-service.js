@@ -9,7 +9,7 @@ import * as roomModel from "./room-model.js"
 /**
  * 
  * @param {number} userId 
- * @returns {Promise<Array<{ id: number, name: string?, password: string?, owner: number, created: Date }>>}
+ * @returns {Promise<Array<{ id: number, name: string?, password: string?, owner: number, created: Date, members: Array<number> }>>}
  */
 export async function getRooms(userId) {
 
@@ -19,7 +19,12 @@ export async function getRooms(userId) {
     return { ok: true, data: { rooms: [] } };
   }
 
-  const { password, ...rooms } = roomsData;
+  const rooms = roomsData.map(({ password, members, ...room }) => {
+    return {
+      ...room,
+      members: members.length > 0 ? members.map(Number) : []
+    };
+  });
 
   return { ok: true, data: { rooms } };
 
@@ -27,16 +32,16 @@ export async function getRooms(userId) {
 
 /**
  * 
- * @param {string} name 
+ * @param {string} username 
  * @param {string} password 
  * @param {number} owner
  * @returns {Promise<{ ok: boolean, message: string | undefined }>}
  */
-export async function createRoom(name, password, owner) {
+export async function createRoom(username, password, owner) {
 
   const passwordHash = password ? await bcrypt.hash(password, SALT_ROUNDS) : null;
 
-  const roomId = await roomModel.create(name, passwordHash, owner);
+  const roomId = await roomModel.create(username, passwordHash, owner);
 
   if (roomId === null) {
     return { ok: false, message: ERROR_CODES.CREATE_ROOM_FAILED };
@@ -88,6 +93,18 @@ export async function joinRoom(roomId, password, userId) {
   }
 
   return { ok: true, data: { room } };
+
+}
+
+export async function leaveRoom(roomId, userId) {
+
+  const room = await roomModel.getRoomById(roomId);
+
+  if (!room) {
+    return { ok: false, message: ERROR_CODES.ROOM_NOT_FOUND };
+  }
+
+  return undefined;
 
 }
 

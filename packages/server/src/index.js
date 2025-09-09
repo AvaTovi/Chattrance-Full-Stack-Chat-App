@@ -2,29 +2,14 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import http from "http";
+import { StatusCodes } from "http-status-codes";
 import session from "express-session";
 
+import { apiResponse } from "./utils/common.js";
 import { sessionStore } from "./config/db.js";
 import { setupSocket } from "./sockets/socket.js";
 
-import userRouter from "./user/user-route.js"
-import { StatusCodes } from "http-status-codes";
-
-/**
- * Creates API response object.
- *
- * @param {boolean} ok - Indicates success or failure
- * @param {string?} error - Optional error message
- * @param {*} data - Optional data payload
- * @returns { { ok: boolean, error: string?, data: * } } API response object
- */
-function apiResponse(ok = true, error = null, data = {}) {
-	return {
-		ok,
-		error,
-		data
-	};
-}
+import userRouter from "./user/user-route.js";
 
 dotenv.config();
 const app = express();

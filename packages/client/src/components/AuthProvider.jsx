@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (process.env.NODE_ENV === "development") {
-      checkAuthentication();
+      getUser();
       if (!authUser) {
         setAuthUser({ id: -1, username: "TEST", email: "TEST" });
       }
@@ -23,15 +23,14 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  async function signup(username, password, email) {
+  async function signup(email, username, password) {
     try {
       const res = await fetch(API_ROUTES.AUTH.SIGNUP, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, email }),
+        body: JSON.stringify({ email, username, password }),
       });
-      const data = await res.json();
-      return data;
+      return await res.json();
     } catch (err) {
       console.error("Signup error:", err);
     }
@@ -45,11 +44,11 @@ export function AuthProvider({ children }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, rememberMe }),
       });
-      const data = await res.json();
-      if (data.ok) {
-        setAuthUser(data.data.user);
+      const serverJSON = await res.json();
+      if (serverJSON.ok) {
+        setAuthUser(serverJSON.data.user);
       }
-      return data;
+      return serverJSON;
     } catch (err) {
       console.error("Login error:", err);
     }
@@ -61,8 +60,7 @@ export function AuthProvider({ children }) {
         method: "POST",
         credentials: "include",
       });
-      const data = await res.json();
-      return data;
+      return await res.json();
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
@@ -70,14 +68,14 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function checkAuthentication() {
+  async function getUser() {
     try {
       const res = await fetch(API_ROUTES.USER.GET_USER, {
         credentials: "include"
       });
-      const data = await res.json();
-      if (data.ok) {
-        setAuthUser(data.data.user);
+      const serverJSON = await res.json();
+      if (serverJSON.ok) {
+        setAuthUser(serverJSON.data.user);
       }
     } catch (err) {
       console.error("Check User error:", err);
@@ -100,11 +98,14 @@ export function AuthProvider({ children }) {
   }
 
   async function resetPassword(id, token, password) {
+
+    const link = API_ROUTES.AUTH.RESET_PASSWORD + `?id=${id}&token=${token}`;
+
     try {
-      const res = await fetch(API_ROUTES.AUTH.RESET_PASSWORD, {
+      const res = await fetch(link, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, token, password }),
+        body: JSON.stringify({ password }),
       });
       return await res.json();
     } catch (err) {
@@ -119,7 +120,7 @@ export function AuthProvider({ children }) {
       signup,
       login,
       logout,
-      checkAuthentication,
+      getUser,
       requestReset,
       resetPassword
     }),

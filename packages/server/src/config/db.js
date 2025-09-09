@@ -22,5 +22,4 @@ export const sessionStore = new MySQLStore({
 	clearExpired: true,
 	checkExpirationInterval: SESSION_CLEANUP,
 	createDatabaseTable: true,
-	maxAge: SESSION_LIFETIME
 }, dbConnection.promise());

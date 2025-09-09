@@ -17,6 +17,8 @@ export const API_ROUTES = {
   },
   CHAT: {
     GET_ROOMS: `${BASE_API}/rooms`,
-    DELETE_ROOMS: `${BASE_API}/delete-room`
+    DELETE_ROOMS: `${BASE_API}/delete-room`,
+    CREATE_ROOMS: `${BASE_API}/create-room`,
+    JOIN_ROOM: `${BASE_API}/join-room`
   }
 }

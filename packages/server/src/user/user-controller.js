@@ -8,9 +8,9 @@ import { sendPasswordResetEmail } from "../utils/email.js";
 import { SESSION_LIFETIME, SESSION_LIFETIME_EXTENDED } from "./constants.js";
 
 import * as userService from "./user-service.js";
-
 import * as validator from "./validation.js";
 
+const BAD_REQUEST = "BAD REQUEST";
 const SERVER_ERROR = "SERVER ERROR";
 
 export async function signup(req, res) {
@@ -20,18 +20,18 @@ export async function signup(req, res) {
     if (typeof req.body.username !== "string" || typeof req.body.password !== "string" || typeof req.body.email !== "string") {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json(apiResponse(false, "Invalid types"));
+        .json(apiResponse(false, BAD_REQUEST));
     }
 
+    const email = req.body.email.trim();
     const username = req.body.username.trim();
     const password = req.body.password.trim();
-    const email = req.body.email.trim();
 
     const error = validator.validateSignup(email, username, password);
 
     if (error) {
       return res
-        .status(StatusCodes.BAD_REQUEST)
+        .status(StatusCodes.UNPROCESSABLE_ENTITY)
         .json(apiResponse(false, error));
     }
 
@@ -65,14 +65,15 @@ export async function signup(req, res) {
 
 export async function login(req, res) {
 
-  const regenerateSession = util.promisify(req.session.regenerate).bind(req.session);
 
   try {
+
+    const regenerateSession = util.promisify(req.session.regenerate).bind(req.session);
 
     if (typeof req.body.username !== "string" || typeof req.body.password !== "string" || typeof req.body.rememberMe !== "boolean") {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json(apiResponse(false, "Body request not correct"));
+        .json(apiResponse(false, BAD_REQUEST));
     }
 
     const username = req.body.username.trim();
@@ -127,9 +128,10 @@ export async function login(req, res) {
 
 export async function logout(req, res) {
 
-  const destroySession = util.promisify(req.session.destroy).bind(req.session);
 
   try {
+
+    const destroySession = util.promisify(req.session.destroy).bind(req.session);
 
     await destroySession();
 
@@ -146,6 +148,31 @@ export async function logout(req, res) {
       .json(apiResponse(false, SERVER_ERROR));
 
   }
+}
+
+export async function getUser(req, res) {
+
+  try {
+
+    const user = req.session.user;
+
+    if (!user) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(apiResponse(false, "Not authenticated"));
+    }
+
+    return res
+      .status(StatusCodes.OK)
+      .json(apiResponse(true, null, { user }));
+
+  } catch (err) {
+    console.error(err);
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(apiResponse(false, SERVER_ERROR));
+  }
 
 }
 
@@ -158,7 +185,7 @@ export async function requestPasswordReset(req, res) {
     if (typeof req.body.email !== "string") {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json(apiResponse(false, "Invalid types"));
+        .json(apiResponse(false, BAD_REQUEST));
     }
 
     const email = req.body.email.trim();
@@ -167,7 +194,7 @@ export async function requestPasswordReset(req, res) {
 
     if (error) {
       return res
-        .status(StatusCodes.BAD_REQUEST)
+        .status(StatusCodes.UNPROCESSABLE_ENTITY)
         .json(apiResponse(false, error));
     }
 
@@ -205,20 +232,20 @@ export async function passwordReset(req, res) {
 
   try {
 
-    const userId = Number(req.body.id);
+    const userId = Number(req.query.id);
 
     if (
       !Number.isInteger(userId) ||
       userId < 0 ||
-      typeof req.body.token !== "string" ||
+      typeof req.query.token !== "string" ||
       typeof req.body.password !== "string"
     ) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json(apiResponse(false, "Invalid types"));
+        .json(apiResponse(false, BAD_REQUEST));
     }
 
-    const token = req.body.token.trim();
+    const token = req.query.token.trim();
     const password = req.body.token.trim();
 
     const errorPassword = validator.isValidPassword(password);
@@ -261,32 +288,3 @@ export async function passwordReset(req, res) {
   }
 
 }
-
-export async function getUser(req, res) {
-
-  try {
-
-    const user = req.session.user;
-
-    if (!user) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json(apiResponse(false, "Not authenticated"));
-    }
-
-    return res
-      .status(StatusCodes.OK)
-      .json(apiResponse(true, null, { user }));
-
-  } catch (err) {
-    console.error(err);
-
-    return res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(apiResponse(false, SERVER_ERROR));
-  }
-
-}
-
-
-
