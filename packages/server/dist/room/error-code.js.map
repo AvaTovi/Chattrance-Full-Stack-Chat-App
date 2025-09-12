@@ -1,0 +1,1 @@
+{"version":3,"file":"error-code.js","sourceRoot":"","sources":["../../src/room/error-code.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,MAAM,CAAC,MAAM,WAAW,GAAG;IACzB,cAAc,EAAE,gBAAgB;IAEhC,kBAAkB,EAAE,oBAAoB;IACxC,gBAAgB,EAAE,kBAAkB;IACpC,kBAAkB,EAAE,oBAAoB;IAExC,kBAAkB,EAAE,oBAAoB;IACxC,sBAAsB,EAAE,wBAAwB;IAEhD,uBAAuB,EAAE,yBAAyB;IAClD,2BAA2B,EAAE,6BAA6B;CAC3D,CAAA"}

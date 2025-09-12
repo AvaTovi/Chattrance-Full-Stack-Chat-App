@@ -1,0 +1,296 @@
+import util from 'util';
+import { type Request, type Response } from 'express';
+
+import { StatusCodes } from "http-status-codes";
+import { type UserData } from './user-service.js';
+import { createApiResponse, type ApiResponse } from "../utils/common.js";
+import { ERROR_CODES } from "./error-codes.js";
+import { sendPasswordResetEmail } from "../utils/email.js";
+import { SESSION_LIFETIME, SESSION_LIFETIME_EXTENDED } from "./constants.js";
+
+import * as userService from "./user-service.js";
+import * as validator from "./validation.js";
+
+const BAD_REQUEST = "BAD REQUEST";
+const SERVER_ERROR = "SERVER ERROR";
+
+export async function signup(req: Request, res: Response) {
+
+  try {
+
+    if (typeof req.body.username !== "string" || typeof req.body.password !== "string" || typeof req.body.email !== "string") {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(createApiResponse(false, BAD_REQUEST));
+    }
+
+    const email: string = req.body.email.trim();
+    const username: string = req.body.username.trim();
+    const password: string = req.body.password.trim();
+
+    const error = validator.validateSignup(email, username, password);
+
+    if (error) {
+      return res
+        .status(StatusCodes.UNPROCESSABLE_ENTITY)
+        .json(createApiResponse(false, error));
+    }
+
+    const result = await userService.createUser(email, username, password);
+
+    if (!result.ok) {
+
+
+      if (result.error === ERROR_CODES.USER_ALREADY_EXIST) {
+        return res
+          .status(StatusCodes.CONFLICT)
+          .json(createApiResponse(false, "Username or email already taken"));
+      }
+      throw new Error(result.error ?? "Unknown error");
+    }
+
+    return res
+      .status(StatusCodes.CREATED)
+      .json(createApiResponse(true));
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(createApiResponse(false, SERVER_ERROR));
+  }
+}
+
+export async function login(req: Request, res: Response) {
+
+
+  try {
+
+    const regenerateSession = util.promisify(req.session.regenerate).bind(req.session);
+
+    if (typeof req.body.username !== "string" || typeof req.body.password !== "string" || typeof req.body.rememberMe !== "boolean") {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(createApiResponse(false, BAD_REQUEST));
+    }
+
+    const username: string = req.body.username.trim();
+    const password: string = req.body.password.trim();
+    const rememberMe: boolean = req.body.rememberMe;
+
+    const error = validator.validateLogin(username, password);
+
+    if (error) {
+      return res
+        .status(StatusCodes.UNPROCESSABLE_ENTITY)
+        .json(createApiResponse(false, error));
+    }
+
+    const result = await userService.authenticateUser(username, password);
+
+    if (!result.ok) {
+
+      if (result.error === ERROR_CODES.USER_NOT_FOUND || result.error === ERROR_CODES.INCORRECT_PASSWORD) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json(createApiResponse(false, "Invalid login"));
+      }
+
+      throw new Error(result.error ?? "Unknown error");
+
+    }
+
+    await regenerateSession();
+
+    if (result.data?.userData !== undefined) {
+      req.session.user = result.data.userData;
+      if (rememberMe) {
+        req.session.cookie.maxAge = SESSION_LIFETIME_EXTENDED;
+      } else {
+        req.session.cookie.maxAge = SESSION_LIFETIME;
+      }
+      return res
+        .status(StatusCodes.OK)
+        .json(createApiResponse(true, null, { user: result.data.userData }));
+    }
+
+    throw new Error("Unknown error");
+
+
+
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(createApiResponse(false, SERVER_ERROR));
+  }
+}
+
+export async function logout(req: Request, res: Response) {
+
+
+  try {
+
+    const destroySession = util.promisify(req.session.destroy).bind(req.session);
+
+    await destroySession();
+
+    res.clearCookie("connect.sid");
+
+    return res.status(StatusCodes.OK).json(createApiResponse(true));
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(createApiResponse(false, SERVER_ERROR));
+
+  }
+}
+
+export async function getUser(req: Request, res: Response) {
+
+  try {
+
+    const user = req.session.user;
+
+    if (user === undefined) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(createApiResponse(false, "Not authenticated"));
+    }
+
+    return res
+      .status(StatusCodes.OK)
+      .json(createApiResponse(true, null, { user }));
+
+  } catch (err) {
+    console.error(err);
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(createApiResponse(false, SERVER_ERROR));
+  }
+
+}
+
+export async function requestPasswordReset(req: Request, res: Response) {
+
+  const genericMessage = "If an account is associated with this email, a message will be sent.";
+
+  try {
+
+    if (typeof req.body.email !== "string") {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(createApiResponse(false, BAD_REQUEST));
+    }
+
+    const email: string = req.body.email.trim();
+
+    const error = validator.isValidEmail(email);
+
+    if (error) {
+      return res
+        .status(StatusCodes.UNPROCESSABLE_ENTITY)
+        .json(createApiResponse(false, error));
+    }
+
+    const result = await userService.createResetToken(email);
+
+    if (!result.ok) {
+
+      if (result.error === ERROR_CODES.USER_NOT_FOUND || result.error === ERROR_CODES.TOKENS_ALREADY_EXIST) {
+        return res
+          .status(StatusCodes.OK)
+          .json(createApiResponse(true, null, genericMessage));
+      }
+
+      throw new Error(result.error ?? "Unknown error");
+    }
+
+    if (!result.ok || !result.data?.userId || !result.data?.plainToken) {
+      throw new Error("Unknown error");
+    }
+
+    await sendPasswordResetEmail(result.data.userId, email, result.data.plainToken);
+    return res
+      .status(StatusCodes.OK)
+      .json(createApiResponse(true, null, genericMessage));
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(createApiResponse(false, SERVER_ERROR));
+  }
+
+}
+
+export async function passwordReset(req: Request, res: Response) {
+
+  try {
+
+    if (
+      typeof req.query.id !== "string" ||
+      typeof req.query.token !== "string" ||
+      typeof req.body.password !== "string"
+    ) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(createApiResponse(false, BAD_REQUEST));
+    }
+
+    const userId = req.query.id.trim();
+    const token = req.query.token.trim();
+    const password = req.body.password.trim();
+
+    const errorPassword = validator.isValidPassword(password);
+
+    if (errorPassword) {
+      return res
+        .status(StatusCodes.UNPROCESSABLE_ENTITY)
+        .json(createApiResponse(false, errorPassword));
+    }
+
+    let result = await userService.verifyResetToken(userId, token);
+
+    if (!result.ok) {
+
+      if (result.error === ERROR_CODES.NO_TOKENS_FOUND || result.error === ERROR_CODES.INVALID_TOKEN) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(createApiResponse(false, "Token invalid or expired or does not exist"));
+      }
+
+      throw new Error(result.error ?? "Unknown error");
+    }
+
+    result = await userService.updatePassword(userId, password);
+
+    if (!result.ok) {
+      throw new Error(result.error ?? "Unknown error");
+    }
+
+    return res
+      .status(StatusCodes.OK)
+      .json(createApiResponse(true));
+
+  } catch (err) {
+    console.error(err);
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(createApiResponse(false, SERVER_ERROR));
+  }
+
+}
