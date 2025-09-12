@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Router } from 'express';
 
 import { API_ROUTES } from 'chattrance-shared';
 
@@ -6,7 +6,7 @@ import { requireJSON } from '../utils/common.js';
 
 import * as userController from './user-controller.js';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // No query parameters only body
 router.post(API_ROUTES.AUTH.SIGNUP, requireJSON, userController.signup);

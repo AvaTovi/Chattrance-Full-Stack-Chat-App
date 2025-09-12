@@ -7,6 +7,7 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
+    "moduleResolution": "nodenext",
     "target": "esnext",
     // For nodejs:
     "lib": [
@@ -38,5 +39,5 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-  }
+  },
 }

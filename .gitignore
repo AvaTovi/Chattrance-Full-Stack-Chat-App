@@ -1,9 +1,10 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-client/node_modules
-client/build
-server/node_modules
+packages/client/node_modules
+packages/client/build
+packages/server/dist
+pacakges/server/node_modules
 node_modules
 .cache/
 /.pnp

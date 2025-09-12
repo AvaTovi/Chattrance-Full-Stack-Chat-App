@@ -12,6 +12,7 @@ import { setupSocket } from './sockets/socket.js';
 
 import roomRouter from './room/room-route.js';
 import userRouter from './user/user-route.js';
+import mongoose from 'mongoose';
 
 export const env = cleanEnv(process.env, {
 	DB_HOST: str(),
@@ -57,7 +58,10 @@ app.use(
 		secret: env.SESSION_SECRET,
 		resave: false,
 		saveUninitialized: false,
-		store: MongoStore.create(options),
+		store: MongoStore.create({
+			// @ts-ignore
+			client: mongoose.connection.getClient()
+		}),
 		cookie: {
 			httpOnly: true,
 			secure: false,
