@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { FRONTEND_ROUTES } from "chattrance-shared";
 
-import NavBar from "./NavBar";
+import NavBar from "../Components/NavBar";
 
 function MainMenu() {
   const navigate = useNavigate();

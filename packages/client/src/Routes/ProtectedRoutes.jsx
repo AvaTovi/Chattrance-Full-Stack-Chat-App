@@ -1,7 +1,6 @@
 import { SpinningCircles } from "react-loading-icons";
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "./AuthProvider";
-import { useEffect } from "react";
+import { useAuth } from "../Authentication/AuthProvider";
 
 const ProtectedRoutes = () => {
   const { authUser, loading } = useAuth();

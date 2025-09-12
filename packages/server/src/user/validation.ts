@@ -58,7 +58,7 @@ export function isValidEmail(email: string): string | null {
 
   const domain = email.split('@')[1];
 
-  if (domain && ALLOWED_EMAIL_DOMAINS.includes(domain)) {
+  if (domain && !ALLOWED_EMAIL_DOMAINS.includes(domain)) {
     return 'Email\'s domain is not whitelisted.';
   }
 

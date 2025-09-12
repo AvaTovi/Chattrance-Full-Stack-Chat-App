@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MainMenu from "./MainMenu";
+import MainMenu from "../Home/MainMenu";
 
 export default function StartQueue() {
 	const [panelOpen, setPanelOpen] = useState(false);

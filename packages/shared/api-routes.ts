@@ -1,25 +1,22 @@
-// packages/shared/api-routes.js
-
-export const BASE_API = "/api";
-
+// packages/shared//api-routes.js
 export const API_ROUTES = {
 
   AUTH: {
-    SIGNUP: `${BASE_API}/auth/signup`,
-    LOGIN: `${BASE_API}/auth/login`,
-    LOGOUT: `${BASE_API}/auth/logout`,
-    REQUEST_RESET_PASSWORD: `${BASE_API}/auth/request-reset`,
-    RESET_PASSWORD: `${BASE_API}/auth/password-reset`,
+    SIGNUP: '/api/auth/signup',
+    LOGIN: '/api/auth/login',
+    LOGOUT: '/api/auth/logout',
+    REQUEST_RESET_PASSWORD: '/api/auth/request-reset',
+    RESET_PASSWORD: '/api/auth/password-reset',
   },
   USER: {
-    GET_USER: `${BASE_API}/user`,
-    CHANGE_PASSWORD: `${BASE_API}/change-password`
+    GET_USER: '/api/user',
+    CHANGE_PASSWORD: '/api/change-password'
   },
   CHAT: {
-    GET_ROOMS: `${BASE_API}/rooms`,
-    GET_MESSAGES: `${BASE_API}/rooms/:roomId`,
-    DELETE_ROOMS: `${BASE_API}/delete-room`,
-    CREATE_ROOMS: `${BASE_API}/create-room`,
-    JOIN_ROOM: `${BASE_API}/join-room`,
+    GET_ROOMS: '/api/rooms',
+    GET_MESSAGES: '/api/rooms/:roomId',
+    DELETE_ROOMS: '/api/delete-room',
+    CREATE_ROOMS: '/api/create-room',
+    JOIN_ROOM: '/api/join-room',
   }
 }

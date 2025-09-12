@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { IoPerson } from "react-icons/io5";
 import io from "socket.io-client";
+
+import { IoPerson } from "react-icons/io5";
+import { CiCirclePlus } from "react-icons/ci";
 
 import { API_ROUTES } from "chattrance-shared";
 
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "../Authentication/AuthProvider";
 import ChatRoom from "./ChatRoom";
-import NavBar from "./NavBar";
+import NavBar from "../Components/NavBar";
 
 const URL = `${process.env.REACT_APP_URL}:${process.env.REACT_APP_PORT}`;
 
@@ -50,6 +52,7 @@ function Chat() {
       if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
 
       const rooms = await getRooms();
+
       setChatRooms(rooms);
     }
     fetchRooms();
@@ -78,6 +81,11 @@ function Chat() {
     setCurrentRoomId(roomId);
   };
 
+  const handleCreateRoom = (e) => {
+    e.preventDefault();
+    console.log("I");
+  }
+
   return (
     <div className="h-screen bg-black text-white flex flex-col">
 
@@ -89,6 +97,15 @@ function Chat() {
         <aside className="hidden md:flex md:w-64 flex-col border-r border-white/10">
           <div className="px-4 py-3 border-b border-white/10">
             <h2 className="text-lg font-semibold">Chat Rooms</h2>
+            <div className="flex items-center">
+              <b className="mr-2">Create a room</b>
+              <button
+                key="joinRoom"
+                onClick={handleCreateRoom}
+              >
+                <CiCirclePlus size={24} />
+              </button>
+            </div>
           </div>
           <ul className="flex-1 overflow-auto">
             {chatRooms.length === 0 ? (
@@ -115,10 +132,10 @@ function Chat() {
           </ul>
         </aside>
 
-        {Number.isInteger(currentRoomId) ? (
+        {currentRoomId ? (
           <ChatRoom roomId={currentRoomId} />
         ) : (
-          <section className="flex-1 flex flex-col items-center">
+          <section className="flex items-center justify-center flex-1">
             <div className="text-center text-white/60">Select a room to chat in</div>
           </section>
         )}

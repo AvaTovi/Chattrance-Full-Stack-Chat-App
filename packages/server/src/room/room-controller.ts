@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 
 import { StatusCodes } from 'http-status-codes';
 
-import { createApiResponse, type ApiResponse } from '../utils/common.js';
+import { createApiResponse } from '../utils/common.js';
 
 import { ERROR_CODES } from './error-code.js';
 
@@ -31,7 +31,7 @@ export async function getRooms(req: Request, res: Response) {
 
     return res
       .status(StatusCodes.OK)
-      .json(createApiResponse(true, null, { rooms }));
+      .json(createApiResponse(true, null, { rooms: rooms.data?.roomsData }));
 
   } catch (err) {
 

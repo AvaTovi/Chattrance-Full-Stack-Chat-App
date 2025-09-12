@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { FRONTEND_ROUTES } from "chattrance-shared";
 
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "../Authentication/AuthProvider";
 
 function NavBar() {
 
@@ -22,7 +22,11 @@ function NavBar() {
       <div className="flex items-center">
         <img src="/CTLogo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
         <h1 className="text-2xl font-extrabold" style={{ fontFamily: "Outfit" }}>
-          Chattrance
+          <a href={FRONTEND_ROUTES.HOME}>
+            <button className="hover:underline">
+              Chattrance
+            </button>
+          </a>
         </h1>
       </div>
 

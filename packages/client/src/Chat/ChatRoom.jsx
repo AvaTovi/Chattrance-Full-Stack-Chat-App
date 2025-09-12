@@ -3,7 +3,9 @@ import io, { Socket } from "socket.io-client";
 
 import { API_ROUTES, CONSTANTS } from "chattrance-shared";
 
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "../Authentication/AuthProvider";
+
+const MESSAGE_SIZE = 500;
 
 function ChatRoom({ roomId }) {
 
@@ -32,7 +34,7 @@ function ChatRoom({ roomId }) {
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text || text.length > CONSTANTS.MESSAGE_SIZE) return;
+    if (!text || text.length > MESSAGE_SIZE) return;
     const currentTime = new Date();
 
   };

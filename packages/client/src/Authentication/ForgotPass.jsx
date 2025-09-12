@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import NavBar from "./NavBar";
+import NavBar from "../Components/NavBar";
 
 import { useAuth } from "./AuthProvider";
 

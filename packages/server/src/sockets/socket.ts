@@ -1,17 +1,14 @@
 import { Server } from 'socket.io';
-/**
- * 
- *
-export function setupSocket(server) {
+import http from 'http';
+
+export function setupSocket(server: http.Server) {
 
   const io = new Server(server);
 
   io.use((socket, next) => {
     const req = socket.request;
     const res = {};
-
-
-  })
+  });
 
 
 
@@ -30,4 +27,3 @@ export function setupSocket(server) {
   });
 
 }
-*/

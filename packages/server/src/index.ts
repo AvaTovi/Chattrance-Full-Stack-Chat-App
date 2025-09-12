@@ -8,7 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { createApiResponse } from './utils/common.js';
 import { startDB } from './config/mongoose.js';
-//import { setupSocket } from './sockets/socket.js';
+import { setupSocket } from './sockets/socket.js';
 
 import roomRouter from './room/room-route.js';
 import userRouter from './user/user-route.js';
@@ -76,7 +76,7 @@ app.use(roomRouter);
 
 const server = http.createServer(app);
 
-//setupSocket(server);
+setupSocket(server);
 
 server.listen(process.env.PORT, () =>
 	console.log(`Server running on ${env.BACKEND_URL}:${env.PORT}`),

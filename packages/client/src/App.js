@@ -1,15 +1,18 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
-import { AuthProvider } from "./components/AuthProvider";
-import Chat from "./components/Chat";
-import ForgotPass from "./components/ForgotPass";
-import JoinQueue from "./components/JoinQueue";
-import Login from "./components/Login";
-import MainMenu from "./components/MainMenu";
-import ProtectedRoutes from "./components/ProtectedRoutes";
-import ResetPass from "./components/ResetPass";
-import Signup from "./components/Signup";
-import StartQueue from "./components/StartQueue";
+import { AuthProvider } from './Authentication/AuthProvider';
+import ForgotPass from "./Authentication/ForgotPass";
+import Login from "./Authentication/Login";
+import ResetPass from "./Authentication/ResetPass";
+import Signup from "./Authentication/Signup";
+
+import Chat from "./Chat/Chat";
+import JoinQueue from "./Chat/JoinQueue";
+import StartQueue from "./Chat/StartQueue";
+
+import MainMenu from "./Home/MainMenu";
+
+import ProtectedRoutes from "./Routes/ProtectedRoutes";
 
 import { FRONTEND_ROUTES } from "chattrance-shared";
 

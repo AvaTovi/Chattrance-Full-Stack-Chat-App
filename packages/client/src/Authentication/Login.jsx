@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
-import NavBar from "./NavBar";
+import NavBar from "../Components/NavBar";
 
 import { useAuth } from "./AuthProvider";
 

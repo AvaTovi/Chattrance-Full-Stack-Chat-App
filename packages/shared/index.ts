@@ -1,4 +1,4 @@
-// packages/shared/index.js
+// packages/shared/index.ts
 
-export { FRONTEND_ROUTES } from "./frontend-routes.js";
-export { BASE_API, API_ROUTES } from "./api-routes.js";
+export { FRONTEND_ROUTES } from "./frontend-routes.ts";
+export { API_ROUTES } from "./api-routes.ts";

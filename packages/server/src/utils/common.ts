@@ -10,7 +10,7 @@ export interface ApiResponse<T = any> {
 export interface ServiceResponse<T = any> {
   ok: boolean,
   error: string | null,
-  data?: T | null
+  data: T | null
 };
 
 export const createApiResponse = <T>(ok: boolean, error: string | null = null, data: T | null = null): ApiResponse<T> => ({
