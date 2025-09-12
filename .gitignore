@@ -3,6 +3,7 @@
 # dependencies
 packages/client/node_modules
 packages/client/build
+
 packages/server/dist
 pacakges/server/node_modules
 node_modules

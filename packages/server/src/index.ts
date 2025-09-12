@@ -8,11 +8,14 @@ import { StatusCodes } from 'http-status-codes';
 
 import { createApiResponse } from './utils/common.js';
 import { startDB } from './config/mongoose.js';
-import { setupSocket } from './sockets/socket.js';
+//import { setupSocket } from './sockets/socket.js';
 
 import roomRouter from './room/room-route.js';
 import userRouter from './user/user-route.js';
 import mongoose from 'mongoose';
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const env = cleanEnv(process.env, {
 	DB_HOST: str(),
@@ -51,8 +54,6 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 	next();
 });
 
-const options = {};
-
 app.use(
 	session({
 		secret: env.SESSION_SECRET,
@@ -75,7 +76,7 @@ app.use(roomRouter);
 
 const server = http.createServer(app);
 
-setupSocket(server);
+//setupSocket(server);
 
 server.listen(process.env.PORT, () =>
 	console.log(`Server running on ${env.BACKEND_URL}:${env.PORT}`),

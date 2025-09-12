@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
-import { sessionStore } from '../config/db';
-
+/**
+ * 
+ *
 export function setupSocket(server) {
 
   const io = new Server(server);
@@ -29,3 +30,4 @@ export function setupSocket(server) {
   });
 
 }
+*/
