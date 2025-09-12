@@ -152,10 +152,8 @@ export async function joinRoom(req: Request, res: Response) {
         .json(createApiResponse(false, 'Must be logged in'));
     }
 
-    const roomId = Number(req.query['room-id']);
-
     if (
-      !Number.isInteger(roomId) || roomId < 0 ||
+      typeof req.query['room-id'] !== "string" ||
       typeof req.body.password !== 'string'
     ) {
       return res
@@ -163,25 +161,34 @@ export async function joinRoom(req: Request, res: Response) {
         .json(createApiResponse(false, BAD_REQUEST));
     }
 
-    const roomPassword = req.body.password.trim();
+    const roomId: string = req.query['room-id'];
+    const password: string = req.body.password.trim();
 
-    const result = await roomService.joinRoom(roomId, roomPassword, user.id);
+    const result = await roomService.joinRoom(roomId, password, user.id);
 
     if (!result.ok) {
 
-      if (result.message === ERROR_CODES.ROOM_NOT_FOUND) {
+      if (result.error === ERROR_CODES.ROOM_NOT_FOUND) {
         return res
           .status(StatusCodes.UNPROCESSABLE_ENTITY)
           .json(createApiResponse(false, 'Room not found'));
-      } else if (result.message === ERROR_CODES.INCORRECT_PASSWORD) {
+      } else if (result.error === ERROR_CODES.INCORRECT_PASSWORD) {
         return res
           .status(StatusCodes.UNPROCESSABLE_ENTITY)
           .json(createApiResponse(false, 'Incorrect password'));
+      } else if (result.error === ERROR_CODES.ALREADY_IN_ROOM) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(createApiResponse(false, 'Already in room specified'));
       }
 
-      throw new Error(result.message);
+      throw new Error(result.error ?? "Unknown error");
 
     }
+
+    return res
+      .status(StatusCodes.OK)
+      .json(createApiResponse(true));
 
   } catch (err) {
 
