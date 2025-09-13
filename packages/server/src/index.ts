@@ -18,12 +18,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const env = cleanEnv(process.env, {
-	DB_HOST: str(),
-	DB_USER: str(),
-	DB_PASSWORD: str(),
-	DB_PORT: num({ default: 3306 }),
-	DB_NAME: str(),
-	DB_CONNECTION_LIMIT: num({ default: 20 }),
 	SESSION_SECRET: str(),
 	EMAIL_ID: email(),
 	EMAIL_PASSWORD: str(),

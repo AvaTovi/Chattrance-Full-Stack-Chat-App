@@ -1,6 +1,6 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
-import { AuthProvider } from './Authentication/AuthProvider';
+import { AuthProvider } from "./Authentication/AuthProvider";
 import ForgotPass from "./Authentication/ForgotPass";
 import Login from "./Authentication/Login";
 import ResetPass from "./Authentication/ResetPass";

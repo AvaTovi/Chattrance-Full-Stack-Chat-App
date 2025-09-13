@@ -2,7 +2,6 @@ import util from 'util';
 import { type Request, type Response } from 'express';
 
 import { StatusCodes } from 'http-status-codes';
-import { type UserData } from './user-service.js';
 import { createApiResponse, type ApiResponse } from '../utils/common.js';
 import { ERROR_CODES } from './error-codes.js';
 import { sendPasswordResetEmail } from '../utils/email.js';

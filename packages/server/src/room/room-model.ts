@@ -13,7 +13,7 @@ const roomSchema: Schema<IRoom> = new Schema(
   {
     name: {
       type: String,
-      required: true,
+      unique: false,
       maxLength: 64,
     },
     password: {

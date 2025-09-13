@@ -8,7 +8,9 @@ import { API_ROUTES } from "chattrance-shared";
 
 import { useAuth } from "../Authentication/AuthProvider";
 import ChatRoom from "./ChatRoom";
+
 import NavBar from "../Components/NavBar";
+import PopUp from "../Components/PopUp";
 
 const URL = `${process.env.REACT_APP_URL}:${process.env.REACT_APP_PORT}`;
 
@@ -30,15 +32,15 @@ function Chat() {
 
   /**
    * rooms: {
-   *   id: Number,
+   *   id: string,
    *   name: string | null,
    *   owner: Number,
    *   created: Date,
-   *   members: Array<Number> does not include owner
+   *   members: string[] does not include owner
    * }
    */
   const { authUser } = useAuth();
-
+  const [popUp, setPopUp] = useState(false);
   const [chatRooms, setChatRooms] = useState([]);
   const [error, setError] = useState("");
   const [currentRoomId, setCurrentRoomId] = useState(null);
@@ -79,11 +81,14 @@ function Chat() {
 
   const handleRoomClick = (roomId) => {
     setCurrentRoomId(roomId);
+  }
+
+  const openPopUp = () => {
+    setPopUp(!popUp);
   };
 
-  const handleCreateRoom = (e) => {
-    e.preventDefault();
-    console.log("I");
+  const closePopUp = () => {
+    setPopUp(false);
   }
 
   return (
@@ -96,15 +101,13 @@ function Chat() {
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden md:flex md:w-64 flex-col border-r border-white/10">
           <div className="px-4 py-3 border-b border-white/10">
-            <h2 className="text-lg font-semibold">Chat Rooms</h2>
-            <div className="flex items-center">
+            <h2 className="text-center text-lg font-semibold">Chat Rooms</h2>
+            <div className="flex justify-center items-center">
               <b className="mr-2">Create a room</b>
-              <button
-                key="joinRoom"
-                onClick={handleCreateRoom}
-              >
+              <button onClick={openPopUp}>
                 <CiCirclePlus size={24} />
               </button>
+              {popUp && <PopUp onClose={closePopUp} />}
             </div>
           </div>
           <ul className="flex-1 overflow-auto">
@@ -117,12 +120,19 @@ function Chat() {
                   className="px-4 py-3 hover:bg-white/30 focus:bg-gray-900 w-full focus:outline-none focus:border-2 focus:border-blue-500">
                   <div className="flex items-center justify-center gap-3">
                     {room.name ? (
-                      <div className="flex items-center">
-                        <span className="text-xl mr-2">{room.members.length + 1}</span><IoPerson size={24} />
+                      <div className="flex flex-col items-center">
+                        <span>{room.name}</span>
+                        <div className="flex items-center justify-center">
+                          <span className="text-xl mr-2">{room.members.length + 1}</span><IoPerson size={24} />
+                        </div>
+                        <span className="text-xl mr-2">{room.members.length + 1}<IoPerson size={24} /></span>
                       </div>
                     ) : (
-                      <div className="flex items-center">
-                        <span className="text-xl mr-2">{room.members.length + 1}</span><IoPerson size={24} />
+                      <div className="flex flex-col items-center">
+                        <span>{room.id}</span>
+                        <div className="flex items-center justify-center">
+                          <span className="text-xl mr-2">{room.members.length + 1}</span><IoPerson size={24} />
+                        </div>
                       </div>
                     )}
                   </div>

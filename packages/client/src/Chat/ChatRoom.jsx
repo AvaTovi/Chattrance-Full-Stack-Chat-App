@@ -9,6 +9,8 @@ const MESSAGE_SIZE = 500;
 
 function ChatRoom({ roomId }) {
 
+  console.log("WE ARE IN CHAT ROOM:", roomId);
+
   const { authUser } = useAuth();
 
   const [input, setInput] = useState("");

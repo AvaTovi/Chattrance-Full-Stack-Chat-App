@@ -8,9 +8,7 @@ import { ERROR_CODES } from './error-code.js';
 
 import * as roomService from './room-service.js';
 
-import type { RoomData } from './room-service.js';
-
-import type { UserData } from '../user/user-service.js';
+import { MAX_ROOM_NAME } from './constants.js';
 
 const BAD_REQUEST = 'BAD REQUEST';
 const SERVER_ERROR = 'SERVER ERROR';
@@ -57,16 +55,23 @@ export async function createRoom(req: Request, res: Response) {
         .json(createApiResponse(false, 'Must be logged in'));
     }
 
-    if (typeof req.body.roomName !== 'string' || typeof req.body.roomPassword !== 'string') {
+    if (typeof req.body.name !== 'string' || typeof req.body.password !== 'string') {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json(createApiResponse(false, BAD_REQUEST));
     }
 
-    const roomName: string = req.body.roomName.trim();
-    const roomPassword: string = req.body.roomPassword.trim();
+    const name: string = req.body.name.trim();
 
-    const result = await roomService.createRoom(roomName, roomPassword, user.id);
+    if (name.length > MAX_ROOM_NAME) {
+      return res
+        .status(StatusCodes.UNPROCESSABLE_ENTITY)
+        .json(createApiResponse(false, `Room name must be no greater than ${MAX_ROOM_NAME} characters`));
+    }
+
+    const password: string = req.body.password.trim();
+
+    const result = await roomService.createRoom(name, password, user.id);
 
     if (!result.ok) {
       throw new Error(result.error ?? 'Unknown error');

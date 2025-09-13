@@ -48,7 +48,7 @@ export async function getRooms(userId: string): Promise<ServiceResponse<{ roomsD
 
 export async function createRoom(name: string, password: string, owner: string): Promise<ServiceResponse<void>> {
 
-  const passwordHash = password ? await bcrypt.hash(password, SALT_ROUNDS) : '';
+  const passwordHash = password ? await bcrypt.hash(password, SALT_ROUNDS) : null;
 
   await Room.create({
     name,
