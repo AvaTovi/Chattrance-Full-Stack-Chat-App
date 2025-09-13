@@ -1,8 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IMessage extends Document {
-  roomId: mongoose.Types.ObjectId,
-  userId: mongoose.Types.ObjectId,
+  _id: mongoose.Schema.Types.ObjectId,
+  roomId: mongoose.Schema.Types.ObjectId,
+  userId: mongoose.Schema.Types.ObjectId,
   content: string,
   created: Date
 }

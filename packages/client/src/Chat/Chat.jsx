@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import io from "socket.io-client";
 
 import { IoPerson } from "react-icons/io5";
@@ -6,7 +6,6 @@ import { CiCirclePlus } from "react-icons/ci";
 
 import { API_ROUTES } from "chattrance-shared";
 
-import { useAuth } from "../Authentication/AuthProvider";
 import ChatRoom from "./ChatRoom";
 
 import NavBar from "../Components/NavBar";
@@ -19,25 +18,12 @@ const socket = io(URL, {
   autoConnect: false
 });
 
-/**
- * 
- * @param {Date} d 
- * @returns {string}
- */
-function fmtTime(d) {
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
 function Chat() {
 
-  const { authUser } = useAuth();
-  const [popUp, setPopUp] = useState(false);
   const [chatRooms, setChatRooms] = useState([]);
+  const [currentRoomIndex, setCurrentRoomId] = useState(null);
   const [error, setError] = useState("");
-  const [currentRoomId, setCurrentRoomId] = useState(null);
-
-
-  const listRef = useRef(null);
+  const [popUp, setPopUp] = useState(false);
 
   useEffect(() => {
 
@@ -48,13 +34,14 @@ function Chat() {
     fetchRooms();
   }, []);
 
+  const messageBoxes = chatRooms.map(room => { return <ChatRoom key={room.id} roomId={room.id} /> });
+
   async function getRooms() {
     try {
       const res = await fetch(API_ROUTES.CHAT.GET_ROOMS, {
-        withCredentials: true
-      })
+        credentials: "include"
+      });
       const serverJSON = await res.json();
-      console.log(serverJSON);
       if (serverJSON.ok) {
         return serverJSON.data.rooms;
       } else {
@@ -67,8 +54,10 @@ function Chat() {
     }
   }
 
-  const handleRoomClick = (roomId) => {
-    setCurrentRoomId(roomId);
+  const handleRoomClick = (index) => {
+    if (index !== currentRoomIndex) {
+      setCurrentRoomId(index);
+    }
   };
 
   const openPopUp = () => {
@@ -102,9 +91,9 @@ function Chat() {
             {chatRooms.length === 0 ? (
               <li className="text-center px-4 py-3 text-white/60">No chat rooms yet</li>
             ) : (
-              chatRooms.map((room) => (
+              chatRooms.map((room, index) => (
                 <button key={room.id}
-                  onClick={() => { handleRoomClick(room.id) }}
+                  onClick={() => { handleRoomClick(index) }}
                   className="px-4 py-3 hover:bg-white/30 focus:bg-gray-900 w-full focus:outline-none focus:border-2 focus:border-blue-500">
                   <div className="flex items-center justify-center gap-3">
                     {room.name ? (
@@ -130,8 +119,8 @@ function Chat() {
           </ul>
         </aside>
 
-        {currentRoomId ? (
-          <ChatRoom roomId={currentRoomId} />
+        {currentRoomIndex !== null ? (
+          messageBoxes[currentRoomIndex]
         ) : (
           <section className="flex items-center justify-center flex-1">
             <div className="text-center text-white/60">Select a room to chat in</div>

@@ -10,14 +10,14 @@ import ResetToken from './reset-token-model.js';
 
 import { ERROR_CODES } from './error-codes.js';
 
-export interface UserData {
+export type UserData = {
   id: string,
   email: string,
   name: string,
   created: Date
 };
 
-export interface ResetTokenData {
+export type ResetTokenData = {
   token: string,
   userId: string,
   expires: Date

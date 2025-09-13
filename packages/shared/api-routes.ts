@@ -14,9 +14,13 @@ export const API_ROUTES = {
   },
   CHAT: {
     GET_ROOMS: '/api/rooms',
-    GET_MESSAGES: '/api/rooms/:roomId',
     DELETE_ROOMS: '/api/delete-room',
     CREATE_ROOMS: '/api/create-room',
     JOIN_ROOM: '/api/join-room',
+  },
+  MESSAGES: {
+    GET_MESSAGES: '/api/get-message',
+    SEND_MESSAGE: '/api/send-message',
+    DELETE_MESSAGE: '/api/delete-message'
   }
 }

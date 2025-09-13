@@ -1,13 +1,13 @@
 import type { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-export interface ApiResponse<T = any> {
+export type ApiResponse<T = any> = {
   ok: boolean,
   error: string | null,
   data: T | null
 };
 
-export interface ServiceResponse<T = any> {
+export type ServiceResponse<T = any> = {
   ok: boolean,
   error: string | null,
   data: T | null

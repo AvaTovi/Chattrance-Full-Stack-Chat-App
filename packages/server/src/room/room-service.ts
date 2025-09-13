@@ -10,7 +10,7 @@ import { createServiceResponse, type ServiceResponse } from '../utils/common.js'
 import mongoose from 'mongoose';
 import User from '../user/user-model.js';
 
-export interface RoomData {
+type RoomData = {
   id: string,
   name?: string,
   owner: string,
@@ -28,7 +28,8 @@ export async function getRooms(userId: string): Promise<ServiceResponse<{ roomsD
   }).lean();
 
   if (!rooms) {
-    return createServiceResponse(true, null, { roomsData: [] as RoomData[] });
+    const roomsData: RoomData[] = [] as const;
+    return createServiceResponse(true, null, { roomsData });
   }
 
   const roomsData = rooms.map(room => {
@@ -38,9 +39,9 @@ export async function getRooms(userId: string): Promise<ServiceResponse<{ roomsD
       owner: room.owner.toString(),
       created: room.created,
       members: room.members.map(member => member.toString())
-    }
+    } as const;
     return roomData;
-  })
+  });
 
   return createServiceResponse(true, null, { roomsData });
 

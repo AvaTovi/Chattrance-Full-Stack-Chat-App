@@ -113,19 +113,16 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const value = useMemo(
-    () => ({
-      authUser,
-      loading,
-      signup,
-      login,
-      logout,
-      getUser,
-      requestReset,
-      resetPassword
-    }),
-    [authUser, loading]
-  );
+  const value = {
+    authUser,
+    loading,
+    signup,
+    login,
+    logout,
+    getUser,
+    requestReset,
+    resetPassword
+  };
 
   return (
     <AuthContext.Provider value={value}>

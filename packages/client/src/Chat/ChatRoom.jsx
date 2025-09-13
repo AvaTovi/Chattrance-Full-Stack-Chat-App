@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 
 import { API_ROUTES, CONSTANTS } from "chattrance-shared";
@@ -7,26 +7,76 @@ import { useAuth } from "../Authentication/AuthProvider";
 
 const MESSAGE_SIZE = 500;
 
+function fmtTime(d) {
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 function ChatRoom({ roomId }) {
 
-  console.log("WE ARE IN CHAT ROOM:", roomId);
-
   const { authUser } = useAuth();
-
+  const [error, setError] = useState("");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
 
   const listRef = useRef(null);
 
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const messagesFromRoom = await getMessage();
+      if (messagesFromRoom.length === [].length) {
+        return;
+      }
+      setMessages([...messagesFromRoom]);
+    };
+    fetchMessages();
+  })
+
+  const getMessage = async () => {
+
+    try {
+      const res = await fetch(`${API_ROUTES.MESSAGES.GET_MESSAGES}?room-id=${roomId}`, {
+        credentials: "include"
+      });
+      const serverJSON = await res.json();
+
+      if (serverJSON.ok) {
+        console.log(serverJSON)
+        return serverJSON.data.messages
+      } else {
+        setError(serverJSON.error);
+        return [];
+      }
+
+    } catch (err) {
+      console.error("Get message error:", err);
+      return [];
+    }
+  }
+
+  const sendMessage = async (content) => {
+    try {
+      const res = await fetch(`${API_ROUTES.MESSAGES.SEND_MESSAGE}?room-id=${roomId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ content })
+      });
+      return await res.json();
+    } catch (err) {
+      console.error("Send message error:", err);
+    }
+
+  }
+
   const handleMessage = (e) => {
-    e.preventDefault();
     setInput(e.target.value);
-    console.log(e.target.value);
   };
 
   const handleKeyDown = (e) => {
-    e.preventDefault();
     if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       handleSend();
     }
   };
@@ -34,8 +84,7 @@ function ChatRoom({ roomId }) {
   const handleSend = () => {
     const text = input.trim();
     if (!text || text.length > MESSAGE_SIZE) return;
-    const currentTime = new Date();
-
+    setMessages([...messages, { id: 0, from: "some guy", at: new Date(), text }]);
   };
 
   return (
