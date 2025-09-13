@@ -18,13 +18,10 @@ function ChatRoom({ roomId }) {
 
   const listRef = useRef(null);
 
-
-  const sendMessage = () => {
-
-  };
-
-  const handleChange = (e) => {
+  const handleMessage = (e) => {
+    e.preventDefault();
     setInput(e.target.value);
+    console.log(e.target.value);
   };
 
   const handleKeyDown = (e) => {
@@ -73,7 +70,7 @@ function ChatRoom({ roomId }) {
         <div className="flex gap-2">
           <textarea
             value={input}
-            onChange={handleChange}
+            onChange={handleMessage}
             onKeyDown={handleKeyDown}
             placeholder="Type a message"
             className="flex-1 resize-none rounded-xl bg-white/5 text-white placeholder-white/40 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -87,7 +84,7 @@ function ChatRoom({ roomId }) {
             Send
           </button>
         </div>
-        <div className="text-xs text-white/50 mt-1">
+        <div className="flex items-center text-xs text-white/50 mt-1">
           Press <kbd className="px-1 py-0.5 bg-white/10 rounded">Enter</kbd> to send •{" "}
           <kbd className="px-1 py-0.5 bg-white/10 rounded">Shift</kbd>+<kbd className="px-1 py-0.5 bg-white/10 rounded">Enter</kbd> for newline
         </div>

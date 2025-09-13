@@ -30,15 +30,6 @@ function fmtTime(d) {
 
 function Chat() {
 
-  /**
-   * rooms: {
-   *   id: string,
-   *   name: string | null,
-   *   owner: Number,
-   *   created: Date,
-   *   members: string[] does not include owner
-   * }
-   */
   const { authUser } = useAuth();
   const [popUp, setPopUp] = useState(false);
   const [chatRooms, setChatRooms] = useState([]);
@@ -51,10 +42,7 @@ function Chat() {
   useEffect(() => {
 
     const fetchRooms = async () => {
-      if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
-
       const rooms = await getRooms();
-
       setChatRooms(rooms);
     }
     fetchRooms();
@@ -81,7 +69,7 @@ function Chat() {
 
   const handleRoomClick = (roomId) => {
     setCurrentRoomId(roomId);
-  }
+  };
 
   const openPopUp = () => {
     setPopUp(!popUp);
@@ -100,19 +88,19 @@ function Chat() {
       {/* Lists all chat rooms you are active in */}
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden md:flex md:w-64 flex-col border-r border-white/10">
-          <div className="px-4 py-3 border-b border-white/10">
+          <div className="flex flex-col gap-2 px-4 py-3 border-b border-white/10">
             <h2 className="text-center text-lg font-semibold">Chat Rooms</h2>
             <div className="flex justify-center items-center">
-              <b className="mr-2">Create a room</b>
+              <p className="mr-2">Create a room</p>
               <button onClick={openPopUp}>
-                <CiCirclePlus size={24} />
+                <CiCirclePlus size={30} color="skyblue" />
               </button>
               {popUp && <PopUp onClose={closePopUp} />}
             </div>
           </div>
           <ul className="flex-1 overflow-auto">
             {chatRooms.length === 0 ? (
-              <li className="px-4 py-3 text-white/60">No chat rooms yet</li>
+              <li className="text-center px-4 py-3 text-white/60">No chat rooms yet</li>
             ) : (
               chatRooms.map((room) => (
                 <button key={room.id}
