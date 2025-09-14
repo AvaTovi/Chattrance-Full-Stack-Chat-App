@@ -29,7 +29,7 @@ const messageSchema: Schema<IMessage> = new Schema(
     },
     created: {
       type: Date,
-      required: true,
+      default: new Date()
     }
   }
 );

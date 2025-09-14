@@ -33,14 +33,13 @@ export async function getRooms(userId: string): Promise<ServiceResponse<{ roomsD
   }
 
   const roomsData = rooms.map(room => {
-    const roomData: RoomData = {
+    return {
       id: room._id.toString(),
       name: room.name,
       owner: room.owner.toString(),
       created: room.created,
       members: room.members.map(member => member.toString())
     } as const;
-    return roomData;
   });
 
   return createServiceResponse(true, null, { roomsData });
@@ -51,11 +50,13 @@ export async function createRoom(name: string, password: string, owner: string):
 
   const passwordHash = password ? await bcrypt.hash(password, SALT_ROUNDS) : null;
 
+  const members: mongoose.Schema.Types.ObjectId[] = [];
+
   await Room.create({
     name,
     password: passwordHash,
     owner,
-    members: [] as mongoose.Schema.Types.ObjectId[],
+    members,
   });
 
   return createServiceResponse(true);
