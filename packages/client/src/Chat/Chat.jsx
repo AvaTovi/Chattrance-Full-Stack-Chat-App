@@ -120,7 +120,7 @@ function Chat() {
                 <button
                   key={room.id}
                   onClick={() => { handleRoomClick(index) }}
-                  className="px-4 py-3 hover:bg-white/30 focus:bg-gray-900 w-full focus:outline-none focus:border-2 focus:border-blue-500">
+                  className="px-4 py-3 hover:bg-gray-500 focus:bg-gray-800 w-full focus:outline-none focus:border-2 focus:border-blue-500">
 
                   <div className="flex flex-col items-center justify-center gap-3">
 
