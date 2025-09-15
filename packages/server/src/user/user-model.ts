@@ -21,20 +21,21 @@ const userSchema: Schema<IUser> = new Schema(
 			type: String,
 			required: true,
 			unique: true,
+			trim: true,
 			maxLength: 64
 		},
 		password: {
 			type: String,
 			required: true,
 			minLength: 60,
-			maxLength: 60
+			maxLength: 60,
+			default: null
 		},
 		created: {
 			type: Date,
-			default: Date.now
+			default: new Date()
 		}
-	},
-	{ timestamps: false }
+	}
 );
 
 const User = mongoose.model<IUser>('User', userSchema);

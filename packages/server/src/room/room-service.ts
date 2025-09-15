@@ -9,6 +9,7 @@ import Room from './room-model.js'
 import { createServiceResponse, type ServiceResponse } from '../utils/common.js';
 import mongoose from 'mongoose';
 import User from '../user/user-model.js';
+import Message from '../message/message-model.js';
 
 type RoomData = {
   id: string,
@@ -82,6 +83,8 @@ export async function deleteRoom(roomId: string, userId: string): Promise<Servic
 
   await room.deleteOne();
 
+  Message.deleteMany({ roomId });
+
   return createServiceResponse(true);
 
 }
@@ -151,6 +154,8 @@ export async function leaveRoom(roomId: string, userId: string): Promise<Service
 
   room.members = room.members.filter(member => member.toString() !== userId);
   await room.save();
+
+  Message.deleteMany({ roomId, userId });
 
   return createServiceResponse(true);
 

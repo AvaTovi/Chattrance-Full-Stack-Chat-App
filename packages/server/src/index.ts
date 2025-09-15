@@ -1,20 +1,21 @@
-import MongoStore from 'connect-mongo';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { cleanEnv, str, email, num, url } from 'envalid';
 import express, { type Request, type Response, type NextFunction } from 'express';
 import session from 'express-session';
 import http from 'http';
+import mongoose from 'mongoose';
+import MongoStore from 'connect-mongo';
 import { StatusCodes } from 'http-status-codes';
 
 import { createApiResponse } from './utils/common.js';
 import { startDB } from './config/mongoose.js';
 import { setupSocket } from './sockets/socket.js';
 
-import roomRouter from './room/room-route.js';
 import userRouter from './user/user-route.js';
-import mongoose from 'mongoose';
+import roomRouter from './room/room-route.js';
+import messageRouter from './message/message-route.js';
 
-import dotenv from 'dotenv';
 dotenv.config();
 
 export const env = cleanEnv(process.env, {
@@ -30,7 +31,9 @@ export const env = cleanEnv(process.env, {
 await startDB();
 
 const app = express();
+
 app.use(cors());
+
 app.use(express.json());
 
 interface Error {
@@ -48,29 +51,29 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 	next();
 });
 
-app.use(
-	session({
-		secret: env.SESSION_SECRET,
-		resave: false,
-		saveUninitialized: false,
-		store: MongoStore.create({
-			// @ts-ignore
-			client: mongoose.connection.getClient()
-		}),
-		cookie: {
-			httpOnly: true,
-			secure: false,
-			sameSite: 'strict',
-		},
+const sessionMiddleware = session({
+	secret: env.SESSION_SECRET,
+	resave: false,
+	saveUninitialized: false,
+	store: MongoStore.create({
+		// @ts-expect-error
+		client: mongoose.connection.getClient()
 	}),
-);
+	cookie: {
+		httpOnly: true,
+		secure: false,
+		sameSite: 'strict',
+	},
+});
 
+app.use(sessionMiddleware);
 app.use(userRouter);
 app.use(roomRouter);
+app.use(messageRouter);
 
 const server = http.createServer(app);
 
-setupSocket(server);
+setupSocket(server, sessionMiddleware);
 
 server.listen(process.env.PORT, () =>
 	console.log(`Server running on ${env.BACKEND_URL}:${env.PORT}`),

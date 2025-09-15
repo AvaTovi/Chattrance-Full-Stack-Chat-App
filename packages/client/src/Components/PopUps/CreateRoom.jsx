@@ -1,15 +1,15 @@
-// Popup.js
-import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useState } from "react";
+
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { API_ROUTES } from "chattrance-shared";
 
-import "./PopUp.css";
+import "./CreateRoom.css";
 
-const Popup = ({ onClose }) => {
+const CreateRoomPopUp = ({ onClose }) => {
 
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -25,6 +25,7 @@ const Popup = ({ onClose }) => {
   const handleCreateRoom = async () => {
     const res = await fetch(API_ROUTES.CHAT.CREATE_ROOMS, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json"
       },
@@ -85,4 +86,4 @@ const Popup = ({ onClose }) => {
   );
 };
 
-export default Popup;
+export default CreateRoomPopUp;

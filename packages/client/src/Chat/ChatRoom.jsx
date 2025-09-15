@@ -1,74 +1,82 @@
-import React, { useEffect, useRef, useState } from "react";
-import io, { Socket } from "socket.io-client";
-
-import { API_ROUTES, CONSTANTS } from "chattrance-shared";
+import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "../Authentication/AuthProvider";
 
+import socket from '../socket';
+
 const MESSAGE_SIZE = 500;
 
-function fmtTime(d) {
+function fmtTime(created) {
+  const d = new Date(created);
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 function ChatRoom({ roomId }) {
 
   const { authUser } = useAuth();
-  const [error, setError] = useState("");
+
   const [input, setInput] = useState("");
+
   const [messages, setMessages] = useState([]);
 
-  const listRef = useRef(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+
+  const scrollContainRef = useRef(null);
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      const messagesFromRoom = await getMessage();
-      if (messagesFromRoom.length === [].length) {
-        return;
-      }
-      setMessages([...messagesFromRoom]);
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.emit('join-room', roomId);
+
+    socket.on('load-initial-messages', (prevMsgs) => {
+      setMessages(prevMsgs);
+    });
+
+    socket.on('receive-message', (msg) => {
+      setMessages((prevMsgs) => [...prevMsgs, msg]);
+    });
+
+    socket.on('load-more-messages', (olderMsgs) => {
+      setMessages((currMsgs) => [...olderMsgs, ...currMsgs]);
+    });
+
+    scrollToBottom();
+
+    return () => {
+      socket.emit('leave-room', roomId);
+      socket.off('receive-message');
     };
-    fetchMessages();
-  }, [messages])
+  }, []);
 
-  const getMessage = async () => {
-
-    try {
-      const res = await fetch(`${API_ROUTES.MESSAGES.GET_MESSAGES}?room-id=${roomId}`, {
-        credentials: "include"
-      });
-      const serverJSON = await res.json();
-
-      if (serverJSON.ok) {
-        console.log(serverJSON)
-        return serverJSON.data.messages
-      } else {
-        setError(serverJSON.error);
-        return [];
-      }
-
-    } catch (err) {
-      console.error("Get message error:", err);
-      return [];
+  useEffect(() => {
+    if (shouldAutoScroll) {
+      scrollToBottom();
     }
-  }
+  }, [messages]);
 
-  const sendMessage = async (content) => {
-    try {
-      const res = await fetch(`${API_ROUTES.MESSAGES.SEND_MESSAGE}?room-id=${roomId}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ content })
-      });
-      return await res.json();
-    } catch (err) {
-      console.error("Send message error:", err);
+  const scrollToBottom = () => {
+    const scrollElement = scrollContainRef.current;
+
+    if (scrollElement) {
+      scrollElement.scrollTop = scrollElement.scrollHeight;
     }
+  };
 
-  }
+  const isAtBottom = () => {
+    const scrollElement = scrollContainRef.current;
+    if (!scrollElement) return false;
+    const threshold = 100;
+    return (
+      scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight < threshold
+    );
+  };
+
+  const handleScroll = () => {
+    setShouldAutoScroll(isAtBottom());
+  };
 
   const handleMessage = (e) => {
     setInput(e.target.value);
@@ -78,14 +86,14 @@ function ChatRoom({ roomId }) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
-      setInput("");
     }
   };
 
   const handleSend = () => {
     const text = input.trim();
     if (!text || text.length > MESSAGE_SIZE) return;
-    setMessages([...messages, { id: Math.random() * (1000 - 100 + 1) + 100, from: "some guy", at: new Date(), text }]);
+    socket.emit('send-message', { roomId, content: text });
+    setInput("");
   };
 
   return (
@@ -95,27 +103,33 @@ function ChatRoom({ roomId }) {
           <p>No messages yet</p>
         </div>
       ) : (
-        <ul className="h-full p-4 space-y-3 overflow-auto">
+        <ul
+          ref={scrollContainRef}
+          onScroll={handleScroll}
+          className="flex justify-start flex-col h-full p-4 space-y-3 overflow-y-auto">
           {/* Messages */}
           {messages.map(m => {
-            if (m.id === authUser.id)
+            if (m.userId === authUser.id)
               return (
-                <li key={m.id} className="w-1/2 px-4 py-2">
-                  <div className="ml-2 mb-1 text-sm opacity-80">
-                    You • {fmtTime(m.at)}
+                <li key={m.id} className="ml-auto px-4 py-2">
+                  <div
+                    style={{ width: "fit-content" }}
+                    className="ml-auto mr-2 mb-1 text-sm opacity-80">
+                    You • {fmtTime(m.created)}
                   </div>
                   <div
                     style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.8)"
+                      backgroundColor: "rgba(255, 255, 255, 0.8)",
+                      width: "fit-content"
                     }}
-                    className="inline-block rounded-2xl p-2 text-black">
+                    className="ml-auto rounded-2xl p-2 text-black">
                     <p
                       style={{
                         wordBreak: "break-word",
                         whiteSpace: "pre-wrap",
                         wordWrap: "break-word"
                       }}>
-                      {m.text}
+                      {m.content}
                     </p>
                   </div>
                 </li>
@@ -123,7 +137,7 @@ function ChatRoom({ roomId }) {
             return (
               <li key={m.id} className="w-1/2 px-4 py-2">
                 <div className="ml-2 mb-1 text-sm opacity-80">
-                  {m.from} • {fmtTime(m.at)}
+                  {m.username} • {fmtTime(m.created)}
                 </div>
                 <div
                   style={{
@@ -136,13 +150,15 @@ function ChatRoom({ roomId }) {
                       whiteSpace: "pre-wrap",
                       wordWrap: "break-word"
                     }}>
-                    {m.text}
+                    {m.content}
                   </p>
                 </div>
               </li>
             );
           })}
         </ul>
+
+
       )}
 
       <div className="border-t border-white/10 p-3">

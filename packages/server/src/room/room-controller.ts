@@ -169,6 +169,8 @@ export async function joinRoom(req: Request, res: Response) {
     const roomId: string = req.query['room-id'];
     const password: string = req.body.password.trim();
 
+    console.log(roomId, password);
+
     const result = await roomService.joinRoom(roomId, password, user.id);
 
     if (!result.ok) {

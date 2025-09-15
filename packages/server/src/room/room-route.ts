@@ -6,7 +6,7 @@ import { requireJSON } from '../utils/common.js';
 
 import * as roomController from './room-controller.js';
 
-const router: Router = express.Router();
+const router = express.Router();
 
 // No body neccessary nor query parameters
 router.get(API_ROUTES.CHAT.GET_ROOMS, roomController.getRooms);

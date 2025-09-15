@@ -1,20 +1,22 @@
 import type { ServiceResponse } from '../utils/common.js';
-import Message from './message-model.js';
+
+import User from '../user/user-model.js';
 import Room from '../room/room-model.js';
+import Message from './message-model.js';
+
 import { ERROR_CODES } from './error-code.js';
 import { createServiceResponse } from '../utils/common.js';
-import User from '../user/user-model.js';
-import validator from 'validator';
 
 type MessageData = {
   id: string,
   roomId: string,
   userId: string,
+  username: string,
   content: string,
   created: Date
 };
 
-async function getMessages(roomId: string, userId: string): Promise<ServiceResponse<{ messagesData?: MessageData[] }>> {
+export async function getMessages(roomId: string, userId: string): Promise<ServiceResponse<{ messagesData?: MessageData[] }>> {
 
 
   const room = await Room.findById(roomId).lean();
@@ -29,7 +31,9 @@ async function getMessages(roomId: string, userId: string): Promise<ServiceRespo
     return createServiceResponse(false, ERROR_CODES.USER_NOT_FOUND);
   }
 
-  if (room.owner.toString() !== userId || !room.members.find(member => member.toString() === userId)) {
+  const index = room.members.findIndex(member => member.toString() === userId);
+
+  if (room.owner.toString() !== userId && index === -1) {
     return createServiceResponse(false, ERROR_CODES.USER_NOT_IN_ROOM);
   }
 
@@ -40,7 +44,8 @@ async function getMessages(roomId: string, userId: string): Promise<ServiceRespo
       id: message._id.toString(),
       roomId: message.roomId.toString(),
       userId: message.userId.toString(),
-      content: validator.escape(message.content),
+      username: message.username,
+      content: message.content,
       created: message.created
     } as const;
   });
@@ -48,7 +53,7 @@ async function getMessages(roomId: string, userId: string): Promise<ServiceRespo
   return createServiceResponse(true, null, { messagesData });
 }
 
-async function createMessage(roomId: string, userId: string, content: string) {
+export async function createMessage(roomId: string, userId: string, content: string): Promise<ServiceResponse<{ messageData?: MessageData }>> {
 
   const room = await Room.findById(roomId).lean();
 
@@ -56,17 +61,35 @@ async function createMessage(roomId: string, userId: string, content: string) {
     return createServiceResponse(false, ERROR_CODES.ROOM_NOT_FOUND);
   }
 
-  const user = User.findById(userId).lean();
+  const user = await User.findById(userId).lean();
 
   if (!user) {
     return createServiceResponse(false, ERROR_CODES.USER_NOT_FOUND);
   }
 
-  await Message.create({
+  const message = await Message.create({
     roomId,
     userId,
+    username: user.name,
     content
   });
+
+  const messageData: MessageData = {
+    id: message._id.toString(),
+    roomId: message.roomId.toString(),
+    userId: message.userId.toString(),
+    username: message.username,
+    content: message.content,
+    created: message.created
+  } as const;
+
+  return createServiceResponse(true, null, { messageData });
+
+}
+
+export async function deleteMessage(messageId: string): Promise<ServiceResponse<void>> {
+
+  await Message.findByIdAndDelete(messageId);
 
   return createServiceResponse(true);
 

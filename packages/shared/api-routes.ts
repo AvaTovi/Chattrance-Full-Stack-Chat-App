@@ -20,7 +20,7 @@ export const API_ROUTES = {
   },
   MESSAGES: {
     GET_MESSAGES: '/api/get-message',
-    SEND_MESSAGE: '/api/send-message',
+    CREATE_MESSAGE: '/api/create-message',
     DELETE_MESSAGE: '/api/delete-message'
   }
-}
+};
