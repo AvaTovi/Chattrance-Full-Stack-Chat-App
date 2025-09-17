@@ -20,11 +20,6 @@ function MainMenu() {
     navigate(FRONTEND_ROUTES.QUEUE.JOIN);
   };
 
-  // Ava this was pointless the AuthProvider makes you logged in already
-  const handleOpenChatDev = () => {
-    navigate(FRONTEND_ROUTES.CHAT); // <-- bypass auth via query
-  };
-
   return (
     <div className="h-screen flex flex-col bg-black text-white">
 
@@ -77,16 +72,6 @@ function MainMenu() {
             style={{ fontFamily: "Outfit" }}
           >
             Testing: join chat queue
-          </button>
-
-          {/* NEW testing button */}
-          <button
-            type="button"
-            onClick={handleOpenChatDev}
-            className="px-6 py-2 bg-gray-300 text-black rounded"
-            style={{ fontFamily: "Outfit" }}
-          >
-            Testing: open chat lobby (dev)
           </button>
 
           <Link to="/signup" className="mt-4 text-blue-400 underline">

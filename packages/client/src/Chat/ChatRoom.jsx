@@ -111,7 +111,7 @@ function ChatRoom({ roomId }) {
           {messages.map(m => {
             if (m.userId === authUser.id)
               return (
-                <li key={m.id} className="ml-auto px-4 py-2">
+                <li key={m.id} className="w-1/2 ml-auto px-4 py-2">
                   <div
                     style={{ width: "fit-content" }}
                     className="ml-auto mr-2 mb-1 text-sm opacity-80">
