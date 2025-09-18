@@ -4,15 +4,23 @@ import io from "socket.io-client";
 import { IoPerson } from "react-icons/io5";
 import { CiCirclePlus } from "react-icons/ci";
 import { TbArrowsJoin } from "react-icons/tb";
+import { IoMdExit } from "react-icons/io";
+import { IoTrashBinOutline } from "react-icons/io5";
+
 
 import { API_ROUTES } from "chattrance-shared";
 
 import ChatHeader from "./ChatHeader";
 import ChatRoom from "./ChatRoom";
 
+import { useAuth } from "../Authentication/AuthProvider";
+
 import NavBar from "../Components/NavBar";
-import JoinRoomPopUp from "../Components/PopUps/JoinRoom";
+
 import CreateRoomPopUp from "../Components/PopUps/CreateRoom";
+import JoinRoomPopUp from "../Components/PopUps/JoinRoom";
+import LeaveRoomPopUp from "../Components/PopUps/LeaveRoom";
+import DeleteRoomPopUp from "../Components/PopUps/DeleteRoom";
 
 const URL = `${process.env.REACT_APP_URL}:${process.env.REACT_APP_PORT}`;
 
@@ -23,6 +31,8 @@ const socket = io(URL, {
 
 function Chat() {
 
+  const { authUser } = useAuth();
+
   const [chatRooms, setChatRooms] = useState([]);
 
   const [createButton, setCreateButton] = useState(false);
@@ -30,6 +40,10 @@ function Chat() {
   const [currentRoomIndex, setCurrentRoomId] = useState(null);
 
   const [joinButton, setJoinButton] = useState(false);
+
+  const [leaveButton, setLeaveButton] = useState(false);
+
+  const [deleteButton, setDeleteButton] = useState(false);
 
   useEffect(() => {
 
@@ -67,20 +81,36 @@ function Chat() {
     }
   };
 
-  const openCreatePopUp = async () => {
+  const openCreatePopUp = () => {
     setCreateButton(!createButton);
   };
 
-  const closeCreatePopUp = async () => {
+  const closeCreatePopUp = () => {
     setCreateButton(false);
   }
 
-  const openJoinPopUp = async () => {
+  const openJoinPopUp = () => {
     setJoinButton(!joinButton);
   }
 
-  const closeJoinPopUp = async () => {
+  const closeJoinPopUp = () => {
     setJoinButton(false);
+  }
+
+  const openLeavePopUp = () => {
+    setLeaveButton(!leaveButton);
+  }
+
+  const closeLeavePopUp = () => {
+    setLeaveButton(false);
+  }
+
+  const openDeletePopUp = () => {
+    setLeaveButton(!deleteButton);
+  }
+
+  const closeDeletePopUp = () => {
+    setLeaveButton(false);
   }
 
   return (
@@ -117,40 +147,65 @@ function Chat() {
               <li className="text-center px-4 py-3 text-white/60">No chat rooms yet</li>
             ) : (
               chatRooms.map((room, index) => (
-                <button
+                <div
                   key={room.id}
-                  onClick={() => { handleRoomClick(index) }}
-                  className="px-4 py-3 hover:bg-gray-500 focus:bg-gray-800 w-full focus:outline-none focus:border-2 focus:border-blue-500">
-
-                  <div className="flex flex-col items-center justify-center gap-3">
-
+                  className="flex flex-col items-center justify-center px-4 py-3 hover:bg-gray-500 focus:bg-gray-800 w-full focus:outline-none focus:border-2 focus:border-blue-500 gap-3">
+                  <button
+                    onClick={() => { handleRoomClick(index) }}
+                    className="flex flex-col items-center justify-center gap-3">
                     {room.name ? (
-                      <span>{room.name}</span>
+                      <span className="p-1 border-2">{room.name}</span>
                     ) : null}
 
-                    <span>{room.id}</span>
+                    <span className="p-1 border-2">{room.id.toUpperCase()}</span>
 
-                    <div className="flex items-center justify-center">
+                    <div className="p-1 border-2 flex items-center justify-center">
                       <span className="text-xl mr-2">
                         {room.members.length + 1}
                       </span>
                       <IoPerson size={24} />
                     </div>
+                  </button>
 
-                  </div>
-                </button>
+
+                  {room.owner === authUser.id ? (
+                    <div className="w-full flex items-center justify-center gap-1">
+                      Delete Room
+                      <button
+                        onClick={openDeletePopUp}>
+                        <IoTrashBinOutline size={30} color="red" />
+                      </button>
+                      {leaveButton && <DeleteRoomPopUp onClose={closeDeletePopUp} roomId={room.id} />}
+                    </div>
+                  ) : (
+                    <div className="w-full flex items-center justify-center gap-1">
+                      Leave Room
+                      <button
+                        onClick={openLeavePopUp}>
+                        <IoMdExit size={30} color="red" />
+                      </button>
+                      {leaveButton && <LeaveRoomPopUp onClose={closeLeavePopUp} roomId={room.id} />}
+                    </div>
+                  )}
+                </div>
               ))
             )}
           </ul>
         </aside>
 
-        {currentRoomIndex !== null ? (
-          messageBoxes[currentRoomIndex]
-        ) : (
-          <section className="flex items-center justify-center flex-1">
-            <div className="text-center text-white/60">Select a room to chat in</div>
-          </section>
-        )}
+        <section className="w-full flex flex-col">
+          <ChatHeader
+            roomName={chatRooms[currentRoomIndex].name}
+            roomId={chatRooms[currentRoomIndex].id}
+            roomOwner={chatRooms[currentRoomIndex].owner}
+          />
+          {currentRoomIndex !== null ? (
+            messageBoxes[currentRoomIndex]
+          ) : (
+            <div className="text-center text-white/60">Select a room to chat in
+            </div>
+          )}
+        </section>
 
       </div>
     </div>

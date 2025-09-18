@@ -8,7 +8,7 @@
     "packages/shared"
   ],
   "scripts": {
-    "client": "npm start --prefix packages/client",
+    "client": "npm start --prefix ./packages/client",
     "server": "tsx watch --env-file=./packages/server/.env ./packages/server/src/index.ts",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },

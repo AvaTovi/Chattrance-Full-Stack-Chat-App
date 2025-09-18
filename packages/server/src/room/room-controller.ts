@@ -65,7 +65,7 @@ export async function createRoom(req: Request, res: Response) {
 
     if (name.length > MAX_ROOM_NAME) {
       return res
-        .status(StatusCodes.UNPROCESSABLE_ENTITY)
+        .status(StatusCodes.BAD_REQUEST)
         .json(createApiResponse(false, `Room name must be no greater than ${MAX_ROOM_NAME} characters`));
     }
 
@@ -88,6 +88,64 @@ export async function createRoom(req: Request, res: Response) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(createApiResponse(false, SERVER_ERROR));
+  }
+
+}
+
+export async function leaveRoom(req: Request, res: Response) {
+
+  try {
+
+    const user = req.session.user;
+
+    if (!user) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(createApiResponse(false, 'Must be logged in'));
+    }
+
+    if (typeof req.query['room-id'] !== 'string') {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(createApiResponse(false, BAD_REQUEST));
+    }
+
+    const roomId: string = req.query['room-id'];
+
+    const result = await roomService.leaveRoom(roomId, user.id);
+
+    if (!result.ok) {
+
+      if (result.error === ERROR_CODES.ROOM_NOT_FOUND) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(createApiResponse(false, 'Room not found'));
+      } else if (result.error === ERROR_CODES.CANNOT_LEAVE_ROOM_YOU_OWN) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(createApiResponse(false, 'Cannot leave room you own'));
+      } else if (result.error === ERROR_CODES.NOT_IN_ROOM) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(createApiResponse(false, 'Not in room specified'));
+      }
+
+      throw new Error(result.error ?? 'Unknown error');
+
+    }
+
+    return res
+      .status(StatusCodes.OK)
+      .json(createApiResponse(true));
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(createApiResponse(false, SERVER_ERROR));
+
   }
 
 }
@@ -118,11 +176,11 @@ export async function deleteRoom(req: Request, res: Response) {
 
       if (result.error === ERROR_CODES.ROOM_NOT_FOUND) {
         return res
-          .status(StatusCodes.UNPROCESSABLE_ENTITY)
+          .status(StatusCodes.BAD_REQUEST)
           .json(createApiResponse(false, 'Room not found'));
       } else if (result.error === ERROR_CODES.INSUFFICIENT_PRIVILEGE) {
         return res
-          .status(StatusCodes.UNPROCESSABLE_ENTITY)
+          .status(StatusCodes.BAD_REQUEST)
           .json(createApiResponse(false, 'Insufficient privilege'));
       }
 
@@ -177,11 +235,11 @@ export async function joinRoom(req: Request, res: Response) {
 
       if (result.error === ERROR_CODES.ROOM_NOT_FOUND) {
         return res
-          .status(StatusCodes.UNPROCESSABLE_ENTITY)
+          .status(StatusCodes.BAD_REQUEST)
           .json(createApiResponse(false, 'Room not found'));
       } else if (result.error === ERROR_CODES.INCORRECT_PASSWORD) {
         return res
-          .status(StatusCodes.UNPROCESSABLE_ENTITY)
+          .status(StatusCodes.BAD_REQUEST)
           .json(createApiResponse(false, 'Incorrect password'));
       } else if (result.error === ERROR_CODES.ALREADY_IN_ROOM) {
         return res

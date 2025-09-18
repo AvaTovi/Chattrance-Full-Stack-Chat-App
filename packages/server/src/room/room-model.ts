@@ -29,7 +29,7 @@ const roomSchema: Schema<IRoom> = new Schema(
     },
     created: {
       type: Date,
-      default: new Date()
+      default: Date.now
     },
     members: {
       type: [{

@@ -31,10 +31,11 @@ const CreateRoomPopUp = ({ onClose }) => {
       },
       body: JSON.stringify({ name: form.name, password: form.password }),
     });
-    if (res.ok) {
+    const serverData = await res.json();
+    if (serverData.ok) {
       setMessage("Room created successfully");
     } else {
-      setMessage(res.error);
+      setMessage(serverData.error);
     }
   }
 

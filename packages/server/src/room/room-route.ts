@@ -20,4 +20,6 @@ router.delete(API_ROUTES.CHAT.DELETE_ROOMS, roomController.deleteRoom);
 // Use query parameters and body
 router.patch(API_ROUTES.CHAT.JOIN_ROOM, requireJSON, roomController.joinRoom);
 
+router.patch(API_ROUTES.CHAT.LEAVE_ROOMS, roomController.leaveRoom);
+
 export default router;

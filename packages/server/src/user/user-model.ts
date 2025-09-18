@@ -33,7 +33,7 @@ const userSchema: Schema<IUser> = new Schema(
 		},
 		created: {
 			type: Date,
-			default: new Date()
+			default: Date.now
 		}
 	}
 );

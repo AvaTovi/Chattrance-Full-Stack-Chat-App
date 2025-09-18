@@ -17,6 +17,8 @@ function ChatRoom({ roomId }) {
 
   const [input, setInput] = useState("");
 
+  const [error, setError] = useState("");
+
   const [messages, setMessages] = useState([]);
 
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
@@ -36,6 +38,7 @@ function ChatRoom({ roomId }) {
     });
 
     socket.on('receive-message', (msg) => {
+      console.log(msg);
       setMessages((prevMsgs) => [...prevMsgs, msg]);
     });
 
@@ -97,7 +100,7 @@ function ChatRoom({ roomId }) {
   };
 
   return (
-    <section className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col">
       {messages.length === 0 ? (
         <div className="w-full h-full flex items-center justify-center flex-col text-white/60">
           <p>No messages yet</p>
@@ -179,13 +182,22 @@ function ChatRoom({ roomId }) {
             Send
           </button>
         </div>
+
         <div className="flex items-center text-xs text-white/50 mt-1">
-          Press <kbd className="px-1 py-0.5 bg-white/10 rounded">Enter</kbd> to send •{" "}
-          <kbd className="px-1 py-0.5 bg-white/10 rounded">Shift</kbd>+<kbd className="px-1 py-0.5 bg-white/10 rounded">Enter</kbd> for newline
+          <div>
+
+            Press <kbd className="px-1 py-0.5 bg-white/10 rounded">Enter</kbd> to send •{" "}
+            <kbd className="px-1 py-0.5 bg-white/10 rounded">Shift</kbd>+<kbd className="px-1 py-0.5 bg-white/10 rounded">Enter</kbd> for newline
+          </div>
+          <p className="ml-auto text-red-600 font-semibold">
+            {input.length > MESSAGE_SIZE ? `Cannot exceed ${MESSAGE_SIZE} characters` : null}
+          </p>
         </div>
+
+
       </div>
 
-    </section>
+    </div>
   );
 }
 

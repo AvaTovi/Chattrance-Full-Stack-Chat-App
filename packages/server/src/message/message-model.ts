@@ -35,7 +35,7 @@ const messageSchema: Schema<IMessage> = new Schema(
     },
     created: {
       type: Date,
-      default: new Date()
+      default: Date.now
     }
   }
 );

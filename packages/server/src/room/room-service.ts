@@ -83,7 +83,7 @@ export async function deleteRoom(roomId: string, userId: string): Promise<Servic
 
   await room.deleteOne();
 
-  Message.deleteMany({ roomId });
+  await Message.deleteMany({ roomId });
 
   return createServiceResponse(true);
 
@@ -148,14 +148,17 @@ export async function leaveRoom(roomId: string, userId: string): Promise<Service
     return createServiceResponse(false, ERROR_CODES.CANNOT_LEAVE_ROOM_YOU_OWN)
   }
 
-  if (!room.members.find(member => member.toString() !== userId)) {
+  const index = room.members.findIndex(member => member.toString() === userId);
+
+  if (index === -1) {
     return createServiceResponse(false, ERROR_CODES.NOT_IN_ROOM);
   }
 
-  room.members = room.members.filter(member => member.toString() !== userId);
+  room.members.splice(index, 1);
+
   await room.save();
 
-  Message.deleteMany({ roomId, userId });
+  await Message.deleteMany({ roomId, userId });
 
   return createServiceResponse(true);
 

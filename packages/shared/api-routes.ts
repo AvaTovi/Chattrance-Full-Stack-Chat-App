@@ -15,6 +15,7 @@ export const API_ROUTES = {
   CHAT: {
     GET_ROOMS: '/api/rooms',
     DELETE_ROOMS: '/api/delete-room',
+    LEAVE_ROOMS: '/api/leave-room',
     CREATE_ROOMS: '/api/create-room',
     JOIN_ROOM: '/api/join-room',
   },

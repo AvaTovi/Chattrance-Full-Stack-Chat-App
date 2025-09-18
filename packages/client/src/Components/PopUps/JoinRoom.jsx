@@ -22,7 +22,7 @@ const JoinRoomPopUp = ({ onClose }) => {
   }
 
   const handleJoinRoom = async () => {
-    const res = await fetch(`${API_ROUTES.CHAT.JOIN_ROOM}?room-id=${form.roomId}`, {
+    const res = await fetch(`${API_ROUTES.CHAT.JOIN_ROOM}?room-id=${form.roomId.toLowerCase()}`, {
       method: "PATCH",
       credentials: "include",
       headers: {
