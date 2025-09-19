@@ -20,7 +20,6 @@ const DeleteRoomPopUp = ({ onClose, roomId }) => {
     } else {
       setMessage(serverData.error);
     }
-
   }
 
   return (

@@ -17,8 +17,6 @@ function ChatRoom({ roomId }) {
 
   const [input, setInput] = useState("");
 
-  const [error, setError] = useState("");
-
   const [messages, setMessages] = useState([]);
 
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
@@ -38,7 +36,6 @@ function ChatRoom({ roomId }) {
     });
 
     socket.on('receive-message', (msg) => {
-      console.log(msg);
       setMessages((prevMsgs) => [...prevMsgs, msg]);
     });
 
