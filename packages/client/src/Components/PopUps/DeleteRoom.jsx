@@ -32,7 +32,7 @@ const DeleteRoomPopUp = ({ onClose, roomId }) => {
           Close
         </button>
 
-        <div className="flex flex-col items-center gap-3">
+        <div className="mt-8 flex flex-col items-center gap-3">
 
           <span>Select <strong>Delete</strong> to delete current room or <strong>Close</strong> to exit</span>
 
